@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BITÁCORA</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+
+  <!-- BARRA DE NAVEGACIÓN -->
+  <header class="navbar">
+    <div class="logo">BITÁCORA</div>
+
+    <nav class="nav-menu">
+      <!-- Iconos cargados desde assets/svg/ -->
+      <a href="index.html" class="nav-item" title="Inicio">
+        <img src="assets/svg/home.svg" alt="Inicio" class="icon-svg">
+      </a>
+
+      <a href="modulo1.html" class="nav-item" title="Módulo 1">
+        <img src="assets/icons/component.svg" alt="Módulo 1" class="icon-svg">
+      </a>
+
+      <a href="modulo2.html" class="nav-item" title="Módulo 2">
+        <img src="assets/icons/component.svg" alt="Módulo 2" class="icon-svg">
+      </a>
+
+      <a href="modulo3.html" class="nav-item" title="Módulo 3">
+        <img src="assets/icons/component.svg" alt="Módulo 3" class="icon-svg">
+      </a>
+
+      <a href="modulo4.html" class="nav-item" title="Módulo 4">
+        <img src="assets/icons/component.svg" alt="Módulo 4" class="icon-svg">
+      </a>
+    </nav>
+
+    <!-- BOTÓN CAMBIO DE TEMA (DARK/LIGHT) -->
+    <button id="theme-toggle" class="theme-toggle" aria-label="Cambiar tema">
+      <svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <!-- Icono de Sol / Luna por CSS -->
+        <circle cx="12" cy="12" r="5"/>
+        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="container">
+    
+    <section class="hero-section">
+      <h1 class="main-title"></h1>
+      <p class="subtitle"></p>
+    </section>
+
+    <!-- SECCIONES ESCALABLES VERTICALMENTE -->
+    <section class="content-section">
+
+        <article class="card">
+        <h2>Dinámicas Ecológicas</h2>
+        <div class="media-wrapper">
+          <img src="assets/jpg/01_Dinamicas_Ecologicas.jpg" alt="Ejemplo JPG" class="responsive-media">
+        </div>
+      </article>
+
+    </section>
+
+  </main>
+
+  <!-- PIE DE PÁGINA / CRÉDITOS (EN TODAS LAS PÁGINAS) -->
+  <footer class="site-footer">
+    <p>© 2026 PUJ - Arquitectura - Modelamiento Dinámico. Todos los derechos reservados.</p>
+  </footer>
+
+</body>
+</html>
