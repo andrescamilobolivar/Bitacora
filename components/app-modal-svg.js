@@ -90,14 +90,13 @@ class AppModalSvg extends HTMLElement {
 
     updateTransform() {
         const container = this.shadowRoot.querySelector('.svg-container');
-        // Aplica la transformación CSS aislando el contenedor interno
         container.style.transform = `translate(${this.pointX}px, ${this.pointY}px) scale(${this.scale})`;
     }
 
     handleWheel(e) {
-        e.preventDefault(); // Evita el scroll nativo
-        const delta = Math.sign(e.deltaY) * -0.15; // Velocidad del zoom
-        this.scale = Math.max(0.5, Math.min(this.scale + delta, 10)); // Límite de escala (0.5x a 10x)
+        e.preventDefault();
+        const delta = Math.sign(e.deltaY) * -0.15;
+        this.scale = Math.max(0.5, Math.min(this.scale + delta, 10));
         this.updateTransform();
     }
 
@@ -158,50 +157,44 @@ class AppModalSvg extends HTMLElement {
                 .overlay {
                     position: absolute;
                     top: 0; left: 0; width: 100%; height: 100%;
-                    background: var(--modal-overlay, rgba(0,0,0,0.85));
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
+                    background: var(--modal-overlay, rgba(0,0,0,0.9));
                 }
                 
-                /* Contenedor principal de la tarjeta modal */
+                /* Contenedor principal ajustado a Pantalla Completa (100vw / 100vh) */
                 .modal-content {
                     background: var(--card-bg, #fff);
-                    width: 90vw;
-                    height: 90vh;
-                    border-radius: 8px;
+                    width: 100vw;
+                    height: 100vh;
                     position: relative;
                     display: flex;
                     flex-direction: column;
-                    overflow: hidden; /* Evita que el SVG ampliado se desborde visualmente de la tarjeta blanca */
-                    box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+                    overflow: hidden;
                 }
 
-                /* Header del modal (Botón cerrar independiente del zoom) */
+                /* Header del modal flotante */
                 .modal-header {
                     position: absolute;
                     top: 0; right: 0; left: 0;
-                    padding: 15px;
+                    padding: 20px 25px;
                     display: flex;
                     justify-content: space-between;
                     align-items: flex-start;
-                    pointer-events: none; /* Permite arrastrar el SVG por debajo del header */
+                    pointer-events: none;
                     z-index: 10;
                 }
                 
-                /* Controles sobrepuestos (Fijos, no se afectan por el zoom) */
                 .controls {
                     display: flex;
                     flex-direction: column;
                     gap: 8px;
-                    pointer-events: auto; /* Reactiva el click para los botones */
+                    pointer-events: auto;
                 }
                 .btn-control {
                     background: var(--bg-color, #f4f7f6);
                     border: 1px solid var(--card-border, #ddd);
                     color: var(--text-color, #333);
                     border-radius: 4px;
-                    width: 36px; height: 36px;
+                    width: 40px; height: 40px;
                     font-size: 1.2rem;
                     cursor: pointer;
                     display: flex;
@@ -220,14 +213,21 @@ class AppModalSvg extends HTMLElement {
                 }
                 
                 .close-btn {
-                    background: transparent;
+                    background: rgba(0,0,0,0.5);
+                    border-radius: 50%;
+                    width: 40px; height: 40px;
                     border: none;
-                    font-size: 2.5rem;
-                    line-height: 1;
-                    color: var(--text-color, #333);
+                    font-size: 2rem;
+                    color: white;
                     cursor: pointer;
                     pointer-events: auto;
-                    margin-top: -10px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                }
+                .close-btn:hover { 
+                    background: rgba(0,0,0,0.8); 
                 }
 
                 /* Área visible interactiva (Viewport) */
@@ -247,10 +247,9 @@ class AppModalSvg extends HTMLElement {
 
                 /* Contenedor que realmente sufre la transformación */
                 .svg-container {
-                    width: 80%; /* Tamaño base respecto al modal */
-                    height: 80%;
+                    width: 85%;
+                    height: 85%;
                     transform-origin: center center;
-                    /* Quitamos la transición para que el arrastre con el ratón sea inmediato (sin lag) */
                 }
             </style>
             

@@ -20,7 +20,7 @@ class AppNavbar extends HTMLElement {
                 }
                 .navbar-grid {
                     display: grid;
-                    grid-template-columns: 1fr 1fr; /* Grid 2 columnas */
+                    grid-template-columns: 1fr 1fr;
                     align-items: center;
                     max-width: 1200px;
                     margin: 0 auto;
@@ -29,6 +29,7 @@ class AppNavbar extends HTMLElement {
                     display: flex;
                     justify-content: flex-start;
                     gap: 1.5rem;
+                    align-items: center;
                 }
                 .nav-right {
                     display: flex;
@@ -40,11 +41,18 @@ class AppNavbar extends HTMLElement {
                     font-weight: 500;
                     padding: 0.5rem;
                     transition: color 0.3s;
+                    display: flex;
+                    align-items: center;
                 }
                 a:hover { color: var(--primary-color, #007bff); }
                 a.active {
                     color: var(--primary-color, #007bff);
                     border-bottom: 2px solid var(--primary-color, #007bff);
+                }
+                .home-link svg {
+                    width: 20px;
+                    height: 20px;
+                    fill: currentColor; /* Hereda el color del enlace para cambiar con hover/active */
                 }
                 button.theme-toggle {
                     background: none;
@@ -52,7 +60,7 @@ class AppNavbar extends HTMLElement {
                     cursor: pointer;
                     padding: 0.5rem;
                 }
-                svg {
+                .theme-toggle svg {
                     width: 24px;
                     height: 24px;
                     fill: var(--text-color, #333);
@@ -61,7 +69,11 @@ class AppNavbar extends HTMLElement {
             <header>
                 <nav class="navbar-grid">
                     <div class="nav-left">
-                        <a href="index.html" data-path="/index.html">Inicio</a>
+                        <a href="index.html" data-path="/index.html" class="home-link" aria-label="Inicio">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                            </svg>
+                        </a>
                         <a href="modulo1.html" data-path="/modulo1.html">DE</a>
                         <a href="modulo2.html" data-path="/modulo2.html">RT</a>
                         <a href="modulo3.html" data-path="/modulo3.html">SB</a>
@@ -69,7 +81,6 @@ class AppNavbar extends HTMLElement {
                     </div>
                     <div class="nav-right">
                         <button class="theme-toggle" aria-label="Cambiar Tema">
-                            <!-- Icono SVG genérico para tema -->
                             <svg viewBox="0 0 24 24">
                                 <path d="M12 21c-4.97 0-9-4.03-9-9s4.03-9 9-9 9 4.03 9 9-4.03 9-9 9zm0-16.5c-4.14 0-7.5 3.36-7.5 7.5s3.36 7.5 7.5 7.5 7.5-3.36 7.5-7.5-3.36-7.5-7.5-7.5z"/>
                                 <path d="M12 6v12c3.31 0 6-2.69 6-6s-2.69-6-6-6z"/>
@@ -86,7 +97,6 @@ class AppNavbar extends HTMLElement {
         const currentPath = window.location.pathname;
         
         links.forEach(link => {
-            // Lógica para resaltar pestaña activa
             if (currentPath.endsWith(link.getAttribute('href')) || (currentPath === '/' && link.getAttribute('href') === 'index.html')) {
                 link.classList.add('active');
             }
