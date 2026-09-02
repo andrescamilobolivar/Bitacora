@@ -1,42 +1,29 @@
-document.addEventListener("DOMContentLoaded", () => {
-
-  // --- 1. DETECCIÓN AUTOMÁTICA DE LA PÁGINA ACTIVA ---
-  const currentPath = window.location.pathname;
-  const navLinks = document.querySelectorAll(".nav-menu .nav-item");
-
-  navLinks.forEach((link) => {
-    const linkPath = link.getAttribute("href");
+document.addEventListener('DOMContentLoaded', () => {
     
-    // Asigna "active" si la URL termina en el enlace o si es la raíz '/'
-    if (
-      currentPath.endsWith(linkPath) ||
-      (currentPath.endsWith("/") && linkPath === "index.html")
-    ) {
-      link.classList.add("active");
-    } else {
-      link.classList.remove("active");
-    }
-  });
+    // Delegación de eventos nativa para las tarjetas
+    document.addEventListener('click', (event) => {
+        
+        // 1. Tarjeta SVG
+        const svgCard = event.target.closest('.card-svg');
+        if (svgCard) {
+            const svgNode = svgCard.querySelector('svg');
+            if (svgNode) {
+                // Emitir evento personalizado. Si no hay modal en el DOM, ocurre silenciosamente.
+                window.dispatchEvent(new CustomEvent('open-modal-svg', {
+                    detail: { html: svgNode.outerHTML }
+                }));
+            }
+        }
 
-  // --- 2. CONTROL DEL MODO LIGHT / DARK CON LOCALSTORAGE ---
-  const themeToggleBtn = document.getElementById("theme-toggle");
-  const savedTheme = localStorage.getItem("theme");
-
-  // Aplicar tema guardado previamente (si existe)
-  if (savedTheme) {
-    document.documentElement.setAttribute("data-theme", savedTheme);
-  }
-
-  themeToggleBtn.addEventListener("click", () => {
-    const currentTheme = document.documentElement.getAttribute("data-theme");
-    let newTheme = "dark";
-
-    if (currentTheme === "dark") {
-      newTheme = "light";
-    }
-
-    document.documentElement.setAttribute("data-theme", newTheme);
-    localStorage.setItem("theme", newTheme);
-  });
-
+        // 2. Tarjeta iFrame
+        const iframeCard = event.target.closest('.card-iframe');
+        if (iframeCard) {
+            const iframeNode = iframeCard.querySelector('iframe');
+            if (iframeNode) {
+                window.dispatchEvent(new CustomEvent('open-modal-iframe', {
+                    detail: { src: iframeNode.src }
+                }));
+            }
+        }
+    });
 });

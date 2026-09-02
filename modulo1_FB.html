@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            padding: 2rem 1rem;
+        }
+        .sources-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .source-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .source-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .source-category {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .source-citation {
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+        .source-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border: 1px solid var(--primary-color);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .source-link:hover {
+            background-color: var(--primary-color);
+            color: #ffffff;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="sources-container">
+        <!-- <h1></h1> -->
+        <!-- <p class="subtitle"></p> -->
+
+        <!-- 1 -->
+        <article class="source-card">
+            <span class="source-category">Criterios de análisis – factores ambientales atmosféricos</span>
+            <p class="source-citation">Ecological niche modelling. <em>Current Biology</em>.</p>
+            <a class="source-link" href="https://doi.org/10.1016/j.cub.2024.02.018" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 2 -->
+        <article class="source-card">
+            <span class="source-category">Red de áreas amortiguadoras, biocapacidad y ecotono</span>
+            <p class="source-citation"><strong>NOAA.</strong> Buffer Zone Definition.</p>
+            <a class="source-link" href="https://repository.library.noaa.gov/view/noaa/2447/noaa_2447_DS1.pdf" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 3 -->
+        <article class="source-card">
+            <span class="source-category">Red de interacciones bióticas</span>
+            <p class="source-citation"><strong>Blüthgen, N., & Staab, M.</strong> (2024). A Critical Evaluation of Network Approaches for Studying Species Interactions. <em>Annual Review of Ecology, Evolution, and Systematics</em>.</p>
+            <a class="source-link" href="https://www.annualreviews.org/content/journals/10.1146/annurev-ecolsys-102722-021904" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 4 -->
+        <article class="source-card">
+            <span class="source-category">Ecosofía</span>
+            <p class="source-citation"><strong>Ecosophy</strong> – conceptual reference associated with Arne Næss and Félix Guattari.</p>
+            <a class="source-link" href="https://en.wikipedia.org/wiki/Ecosophy" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 5 -->
+        <article class="source-card">
+            <span class="source-category">Biosfera</span>
+            <p class="source-citation"><strong>Huggett, R. J.</strong> (1999). Ecosphere, biosphere, or Gaia? What to call the global ecosystem. <em>Global Ecology and Biogeography</em>.</p>
+            <a class="source-link" href="https://onlinelibrary.wiley.com/doi/10.1046/j.1365-2699.1999.00158.x" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 6 -->
+        <article class="source-card">
+            <span class="source-category">Paisaje</span>
+            <p class="source-citation"><strong>International Association for Landscape Ecology (IALE).</strong> About IALE / Landscape Ecology.</p>
+            <a class="source-link" href="https://landscape-ecology.org/About-IALE" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 7 -->
+        <article class="source-card">
+            <span class="source-category">Simbiosis y Simbioceno</span>
+            <p class="source-citation"><strong>Albrecht, G.</strong> (2019). Earth Emotions / Generation Symbiocene.</p>
+            <a class="source-link" href="https://doi.org/10.7591/cornell/9781501715228.003.0007" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 8 -->
+        <article class="source-card">
+            <span class="source-category">Panarquía</span>
+            <p class="source-citation"><strong>Gunderson, L. H., & Holling, C. S. (Eds.).</strong> Panarchy: Understanding Transformations in Human and Natural Systems.</p>
+            <a class="source-link" href="https://www.jstor.org/stable/jj.41003716" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 9 -->
+        <article class="source-card">
+            <span class="source-category">Internet de las plantas</span>
+            <p class="source-citation"><strong>Alum et al.</strong> (2026). The Internet of Plants.</p>
+            <a class="source-link" href="https://journals.sagepub.com/doi/abs/10.1177/1934578X261455751" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 10 -->
+        <article class="source-card">
+            <span class="source-category">Inteligencias más que humanas</span>
+            <p class="source-citation"><strong>Bridle, J.</strong> (2022). Ways of Being: Animals, Plants, Machines. <em>Farrar, Straus and Giroux</em>.</p>
+            <a class="source-link" href="https://contemplativejournal.org/review/sbdj8739/" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+    </div>
+</body>
+</html>

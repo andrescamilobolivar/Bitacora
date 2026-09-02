@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            padding: 2rem 1rem;
+        }
+        .sources-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .source-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .source-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .source-category {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .source-citation {
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+        .source-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border: 1px solid var(--primary-color);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .source-link:hover {
+            background-color: var(--primary-color);
+            color: #ffffff;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="sources-container">
+        <!-- <h1></h1> -->
+        <!-- <p class="subtitle"></p> -->
+
+        <!-- 1 -->
+        <article class="source-card">
+            <span class="source-category">Bases de datos y Big Data</span>
+            <p class="source-citation"><strong>Han, X., Gstrein, O. J., & Andrikopoulos, V.</strong> (2024). When we talk about Big Data, what do we really mean? <em>Frontiers in Big Data</em>.</p>
+            <a class="source-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11420115/" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 2 -->
+        <article class="source-card">
+            <span class="source-category">Teoría de modelos dinámicos y MBA</span>
+            <p class="source-citation"><strong>Rodríguez Zoya, L. G., & Roggero, P.</strong> (2015). Modelos basados en agentes: aportes epistemológicos y teóricos para la investigación social. <em>Revista Mexicana de Ciencias Políticas y Sociales</em>.</p>
+            <a class="source-link" href="https://www.revistas.unam.mx/index.php/rmcpys/article/view/52073" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 3 -->
+        <article class="source-card">
+            <span class="source-category">Teoría de simulación ecosistémica y CAS</span>
+            <p class="source-citation"><strong>Levin, S. A.</strong> (1998). Ecosystems and the Biosphere as Complex Adaptive Systems. <em>Ecosystems</em>.</p>
+            <a class="source-link" href="https://collaborate.princeton.edu/en/publications/self-organization-and-the-emergence-of-complexity-in-ecological-s/" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 4 -->
+        <article class="source-card">
+            <span class="source-category">Heurística</span>
+            <p class="source-citation"><strong>Zanakis, S. H., & Evans, J. R.</strong> (1981). Heuristic Optimization: Why, When, and How to Use It. <em>Interfaces</em>.</p>
+            <a class="source-link" href="https://pubsonline.informs.org/doi/10.1287/inte.11.5.84" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 5 -->
+        <article class="source-card">
+            <span class="source-category">Metaheurísticas y referentes aplicados</span>
+            <p class="source-citation"><strong>Blum, C., & Roli, A.</strong> (2003). Metaheuristics in Combinatorial Optimization: Overview and Conceptual Comparison. <em>ACM Computing Surveys</em>.</p>
+            <a class="source-link" href="https://www.sciencedirect.com/science/article/pii/S0020025513001588" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 6 -->
+        <article class="source-card">
+            <span class="source-category">Problemas computacionales NP–PSPACE</span>
+            <p class="source-citation"><strong>Complexity Zoo.</strong> PSPACE – Complexity classes and computational complexity reference.</p>
+            <a class="source-link" href="https://complexityzoo.net/Complexity_Zoo%3AP" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 7 -->
+        <article class="source-card">
+            <span class="source-category">Herramientas</span>
+            <p class="source-citation"><strong>National Research Council.</strong> Catalyzing Inquiry at the Interface of Computing and Biology. <em>National Academies Press</em>.</p>
+            <a class="source-link" href="https://www.nationalacademies.org/read/11480/chapter/4" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 8 -->
+        <article class="source-card">
+            <span class="source-category">Programación</span>
+            <p class="source-citation"><strong>MIT OpenCourseWare.</strong> Introduction to MATLAB Programming – What is Programming?</p>
+            <a class="source-link" href="https://www.ocw.mit.edu/courses/18-s997-introduction-to-matlab-programming-fall-2011/pages/the-basics/what-is-programming/" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 9 -->
+        <article class="source-card">
+            <span class="source-category">Apoyo – formulación de funciones objetivo</span>
+            <p class="source-citation"><strong>NIST.</strong> Dictionary of Algorithms and Data Structures – Objective Function.</p>
+            <a class="source-link" href="https://xlinux.nist.gov/dads/HTML/objective.html" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+    </div>
+</body>
+</html>

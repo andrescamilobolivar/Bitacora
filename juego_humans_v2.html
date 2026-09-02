@@ -1,0 +1,1930 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HUMANS INC. 2050</title>
+<style>
+  :root{
+    --bg-app:#14161c;
+    --bg-app-2:#1b1e26;
+    --panel:#20232c;
+    --panel-2:#262a35;
+    --line:#383c48;
+    --ink:#4a4535;
+    --board-wood:#c9bda1;
+    --board-wood-dark:#b3a684;
+    --text:#eef0f4;
+    --text-dim:#9aa0ae;
+    --text-faint:#6a7080;
+
+    --c-lav:#9b9bd6;
+    --c-lav-light:#c3c3e8;
+    --c-blue:#2f8fd1;
+    --c-orange:#e6672f;
+    --c-yellow:#eecb3d;
+    --c-lime:#86c443;
+    --c-green:#1f7a44;
+    --c-pink:#eeb0c4;
+    --c-slate:#6b6b98;
+
+    --economy:#eecb3d;
+    --wellbeing:#e88bb0;
+    --planet:#4fbd7d;
+
+    --danger:#e5544a;
+    --warn:#e6a13a;
+    --good:#4fbd7d;
+
+    --radius-s:6px;
+    --radius-m:12px;
+    --radius-l:18px;
+    --font-display:'Rajdhani','Segoe UI',system-ui,-apple-system,sans-serif;
+    --font-body: system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    --font-mono: 'Consolas','SFMono-Regular',Menlo,monospace;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at 20% -10%, #23273a 0%, transparent 55%),
+      radial-gradient(ellipse at 100% 110%, #1a2b26 0%, transparent 50%),
+      var(--bg-app);
+    color:var(--text);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  h1,h2,h3,.title-font{
+    font-family:var(--font-display), var(--font-body);
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    font-weight:700;
+  }
+
+  .num{font-family:var(--font-mono); font-variant-numeric:tabular-nums;}
+
+  #app{
+    max-width:1440px;
+    margin:0 auto;
+    padding:14px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    min-height:100%;
+  }
+
+  /* ---------- TOP BAR ---------- */
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:10px 18px;
+    background:linear-gradient(180deg,#242833,#1a1d25);
+    border:1px solid var(--line);
+    border-radius:var(--radius-m);
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+  }
+  .brand .mark{
+    width:34px;height:34px;border-radius:8px;
+    background:conic-gradient(from 210deg, var(--c-lav), var(--c-blue), var(--c-lime), var(--c-orange), var(--c-lav));
+    box-shadow: inset 0 0 0 2px rgba(0,0,0,.35);
+  }
+  .brand .name{font-size:19px; line-height:1;}
+  .brand .name small{display:block; font-size:10px; letter-spacing:.2em; color:var(--text-dim); font-weight:600; margin-top:3px;}
+
+  .round-pill{
+    display:flex; align-items:center; gap:10px;
+    font-family:var(--font-mono);
+    font-size:13px;
+    color:var(--text-dim);
+    background:var(--panel);
+    border:1px solid var(--line);
+    padding:6px 14px;
+    border-radius:999px;
+  }
+  .round-pill b{color:var(--text); font-weight:700;}
+  .round-pill .phase-tag{
+    padding:3px 10px; border-radius:999px; background:var(--panel-2);
+    color:var(--c-lav-light); font-weight:700; letter-spacing:.06em; text-transform:uppercase; font-size:10.5px;
+  }
+
+  /* ---------- CITY INDICATORS ---------- */
+  .indicators{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+  }
+  .ind-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius-m);
+    padding:12px 14px;
+    position:relative;
+    overflow:hidden;
+  }
+  .ind-card::before{
+    content:"";
+    position:absolute; inset:0;
+    opacity:.06;
+    background:var(--dot-color);
+  }
+  .ind-head{
+    display:flex; justify-content:space-between; align-items:baseline;
+    margin-bottom:8px;
+  }
+  .ind-label{
+    font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); font-weight:700;
+    display:flex; align-items:center; gap:6px;
+  }
+  .ind-badge{
+    font-size:10px; padding:2px 8px; border-radius:999px; font-weight:700; letter-spacing:.03em;
+  }
+  .ind-value{
+    font-family:var(--font-mono); font-size:22px; font-weight:700; letter-spacing:.01em;
+  }
+  .ind-value span{ color:var(--text-faint); font-size:13px; font-weight:400;}
+  .ind-delta{ font-size:11px; font-family:var(--font-mono); margin-left:6px; opacity:.9; }
+  .ind-bar-track{
+    height:8px; border-radius:99px; background:#0e1015; margin-top:8px; overflow:hidden;
+    border:1px solid rgba(255,255,255,.04);
+  }
+  .ind-bar-fill{ height:100%; border-radius:99px; transition:width .5s ease; }
+
+  /* ---------- MAIN LAYOUT ---------- */
+  .layout{
+    display:grid;
+    grid-template-columns:270px 1fr 320px;
+    gap:14px;
+    align-items:start;
+  }
+  @media (max-width:1050px){
+    .layout{ grid-template-columns:1fr; }
+  }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius-m);
+    padding:14px;
+  }
+  .panel h3{
+    font-size:13px; color:var(--text-dim); margin:0 0 10px; letter-spacing:.12em;
+    display:flex; align-items:center; gap:8px;
+  }
+  .panel h3::after{ content:""; flex:1; height:1px; background:var(--line); }
+
+  /* ---------- PLAYERS ---------- */
+  .players-col{ display:flex; flex-direction:column; gap:10px; }
+  .player-card{
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:var(--radius-s);
+    padding:10px 12px;
+    position:relative;
+  }
+  .player-card.active{
+    border-color:var(--player-color, var(--c-lav));
+    box-shadow:0 0 0 1px var(--player-color, var(--c-lav)), 0 0 18px -4px var(--player-color, var(--c-lav));
+  }
+  .player-top{ display:flex; align-items:center; gap:8px; margin-bottom:8px;}
+  .player-dot{ width:11px;height:11px;border-radius:50%; background:var(--player-color); flex:none; box-shadow:0 0 6px var(--player-color);}
+  .player-name{ font-weight:700; font-size:13.5px; flex:1;}
+  .player-turn-tag{ font-size:9.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--player-color); font-weight:700;}
+  .player-stats{ display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:12px; }
+  .pstat{ background:#161821; border-radius:6px; padding:6px 8px; }
+  .pstat b{ display:block; font-family:var(--font-mono); font-size:14px; margin-top:2px;}
+  .pstat .lbl{ color:var(--text-faint); font-size:10px; letter-spacing:.05em; text-transform:uppercase;}
+  .player-buildings{ display:flex; flex-wrap:wrap; gap:4px; margin-top:8px;}
+  .bchip{ font-size:12px; background:#161821; border-radius:5px; padding:2px 5px; border:1px solid var(--line);}
+
+  /* ---------- BOARD ---------- */
+  .board-panel{
+    padding:16px;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .board-frame{
+    background:
+      radial-gradient(circle at 30% 20%, rgba(255,255,255,.08), transparent 60%),
+      var(--board-wood);
+    border-radius:var(--radius-l);
+    padding:14px;
+    box-shadow:inset 0 0 0 2px rgba(0,0,0,.15), inset 0 0 30px rgba(0,0,0,.18);
+    position:relative;
+  }
+  .board-frame svg{ display:block; width:100%; height:auto; }
+
+  .hex-poly{
+    stroke:var(--ink);
+    stroke-width:3;
+    stroke-linejoin:round;
+    cursor:pointer;
+    transition:filter .15s ease, transform .15s ease;
+  }
+  .hex-poly:hover{ filter:brightness(1.12); }
+  .hex-poly.selectable{ cursor:pointer; }
+  .hex-poly.unavailable{ cursor:not-allowed; }
+  .hex-group.landed .hex-poly{ stroke:#fff; stroke-width:4; }
+  .hex-group.selected .hex-poly{ stroke:#fff; stroke-width:5; filter:brightness(1.18); }
+  .hex-icon{ font-size:15px; pointer-events:none; user-select:none; }
+  .hex-owner-ring{ fill:none; stroke-width:3; pointer-events:none; }
+  .deco-tri{ stroke:var(--ink); stroke-width:2.5; stroke-linejoin:round; opacity:.92; }
+  .avatar{ transition: cx .35s ease, cy .35s ease; }
+
+  .board-toolbar{
+    display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+  }
+  .legend{ display:flex; gap:10px; flex-wrap:wrap; font-size:11px; color:var(--text-dim);}
+  .legend span{ display:inline-flex; align-items:center; gap:5px;}
+  .legend i{ width:10px;height:10px;border-radius:3px; display:inline-block;}
+
+  /* ---------- PHASE / CONTROLS ---------- */
+  .phase-panel{ display:flex; flex-direction:column; gap:12px; }
+  .phase-steps{ display:flex; gap:4px; }
+  .phase-dot{ flex:1; height:5px; border-radius:99px; background:var(--line); }
+  .phase-dot.active{ background:var(--c-lav-light); }
+  .phase-dot.done{ background:var(--good); }
+
+  .phase-title{ font-size:16px; margin:0; }
+  .phase-desc{ font-size:12.5px; color:var(--text-dim); line-height:1.5; margin:0; }
+
+  .btn{
+    font-family:var(--font-display), var(--font-body);
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    font-weight:700;
+    font-size:13px;
+    padding:11px 16px;
+    border-radius:var(--radius-s);
+    border:1px solid var(--line);
+    background:var(--panel-2);
+    color:var(--text);
+    cursor:pointer;
+    transition:transform .1s ease, background .15s ease, border-color .15s ease;
+  }
+  .btn:hover:not(:disabled){ transform:translateY(-1px); border-color:#565c6e; }
+  .btn:active:not(:disabled){ transform:translateY(0); }
+  .btn:disabled{ opacity:.35; cursor:not-allowed; }
+  .btn-primary{ background:linear-gradient(180deg,#8f8fd8,#6f6fc0); border-color:#8f8fd8; color:#12131a; }
+  .btn-primary:hover:not(:disabled){ filter:brightness(1.08); }
+  .btn-block{ width:100%; }
+  .btn-row{ display:flex; gap:8px; }
+  .btn-ghost{ background:transparent; }
+  .btn-danger{ border-color:var(--danger); color:var(--danger); background:transparent;}
+
+  .dice-wrap{ display:flex; align-items:center; gap:14px; }
+  .die{
+    width:56px;height:56px;border-radius:12px;
+    background:linear-gradient(160deg,#f4f1ea,#d8d4c8);
+    display:grid; place-items:center;
+    font-family:var(--font-mono); font-weight:700; font-size:24px; color:#1c1d22;
+    box-shadow:0 4px 10px rgba(0,0,0,.35), inset 0 0 0 2px rgba(0,0,0,.08);
+    transition:transform .25s ease;
+  }
+  .die.rolling{ animation:roll .5s steps(6); }
+  @keyframes roll{
+    0%{ transform:rotate(0deg);} 100%{ transform:rotate(360deg);}
+  }
+  .dice-hint{ font-size:11px; color:var(--text-faint); }
+
+  .constr-counter{
+    font-size:12px; color:var(--text-dim); display:flex; justify-content:space-between; align-items:center;
+    background:#161821; border-radius:8px; padding:8px 10px;
+  }
+  .constr-counter b{ color:var(--text); font-family:var(--font-mono);}
+
+  /* ---------- LOG ---------- */
+  .log-panel{ max-height:230px; overflow-y:auto; }
+  .log-entry{
+    font-size:12px; color:var(--text-dim); padding:6px 0; border-bottom:1px dashed var(--line);
+    line-height:1.4;
+  }
+  .log-entry:last-child{ border-bottom:none; }
+  .log-entry b{ color:var(--text); }
+  .log-entry .tag{ font-size:9.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--c-lav-light); margin-right:5px;}
+
+  /* ---------- MODAL ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(10,11,15,.72);
+    display:flex; align-items:center; justify-content:center;
+    z-index:100; padding:16px; backdrop-filter:blur(3px);
+  }
+  .modal-overlay.hidden{ display:none; }
+  .modal{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius-l);
+    padding:22px;
+    width:100%;
+    max-width:560px;
+    max-height:88vh;
+    overflow-y:auto;
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
+  }
+  .modal h2{ margin:0 0 4px; font-size:20px; }
+  .modal .sub{ color:var(--text-dim); font-size:12.5px; margin-bottom:16px; }
+
+  .build-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  @media (max-width:480px){ .build-grid{ grid-template-columns:1fr; } }
+  .build-option{
+    text-align:left;
+    border:1px solid var(--line);
+    background:var(--panel-2);
+    border-radius:var(--radius-s);
+    padding:10px 12px;
+    cursor:pointer;
+    color:var(--text);
+    display:flex; flex-direction:column; gap:4px;
+  }
+  .build-option:hover:not(:disabled){ border-color:var(--c-lav-light); }
+  .build-option:disabled{ opacity:.35; cursor:not-allowed; }
+  .build-option .bo-head{ display:flex; justify-content:space-between; align-items:center; font-weight:700;}
+  .build-option .bo-cost{ font-family:var(--font-mono); font-size:12px; color:var(--text-dim); }
+  .build-option .bo-stats{ display:flex; gap:8px; font-family:var(--font-mono); font-size:11px; flex-wrap:wrap; }
+  .stat-pill{ padding:1px 6px; border-radius:99px; background:#161821; }
+  .stat-pill.pos{ color:var(--good); }
+  .stat-pill.neg{ color:var(--danger); }
+
+  .setup-field{ margin-bottom:14px; }
+  .setup-field label{ display:block; font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-dim); margin-bottom:6px;}
+  .setup-field input, .setup-field select{
+    width:100%; padding:10px 12px; border-radius:var(--radius-s); border:1px solid var(--line);
+    background:#161821; color:var(--text); font-family:var(--font-mono); font-size:14px;
+  }
+  .player-name-rows{ display:flex; flex-direction:column; gap:8px; margin-top:4px;}
+  .player-name-row{ display:flex; align-items:center; gap:8px; }
+  .player-name-row .player-dot{ width:14px; height:14px; }
+  .player-name-row input{ flex:1; padding:8px 10px; border-radius:6px; border:1px solid var(--line); background:#161821; color:var(--text); font-family:var(--font-body); font-size:13px;}
+
+  .close-x{
+    position:absolute; top:14px; right:14px; background:none; border:none; color:var(--text-dim);
+    font-size:18px; cursor:pointer;
+  }
+  .modal{ position:relative; }
+
+  .empty-hint{ color:var(--text-faint); font-size:12px; text-align:center; padding:14px; }
+
+  .toast-stack{
+    position:fixed; top:16px; right:16px; z-index:200; display:flex; flex-direction:column; gap:8px; max-width:320px;
+  }
+  .toast{
+    background:var(--panel-2); border:1px solid var(--line); border-left:4px solid var(--c-lav-light);
+    border-radius:8px; padding:10px 12px; font-size:12.5px; box-shadow:0 8px 20px rgba(0,0,0,.35);
+    animation:toastIn .2s ease;
+  }
+  .toast.crisis{ border-left-color:var(--danger); }
+  .toast.good{ border-left-color:var(--good); }
+  @keyframes toastIn{ from{ opacity:0; transform:translateY(-8px);} to{opacity:1; transform:translateY(0);} }
+
+  .final-scores{ display:flex; flex-direction:column; gap:8px; margin:14px 0; }
+  .final-row{ display:flex; align-items:center; gap:10px; background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:10px 12px;}
+  .final-row.winner{ border-color:var(--c-yellow); box-shadow:0 0 0 1px var(--c-yellow); }
+  .final-rank{ font-family:var(--font-mono); font-weight:700; width:24px; }
+  .final-score{ margin-left:auto; font-family:var(--font-mono); font-weight:700; font-size:16px; }
+
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb{ background:#3a3f4c; border-radius:99px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+
+  .footer-note{ text-align:center; font-size:11px; color:var(--text-faint); padding:6px 0 2px; }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ===================== TOP BAR ===================== -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="mark"></div>
+      <div class="name">HUMANS INC. <span style="color:var(--c-lav-light)">2050</span>
+        <small>Gestión de ciudad futurista</small>
+      </div>
+    </div>
+    <div class="round-pill">
+      <span>RONDA <b id="hud-round">1</b>/<span id="hud-maxrounds">10</span></span>
+      <span class="phase-tag" id="hud-phase">Ingresos</span>
+      <span>Turno de <b id="hud-currentplayer" style="color:var(--c-lav-light)">—</b></span>
+    </div>
+  </div>
+
+  <!-- ===================== CITY INDICATORS ===================== -->
+  <div class="indicators">
+    <div class="ind-card" style="--dot-color:var(--economy)">
+      <div class="ind-head">
+        <span class="ind-label">💰 Economía</span>
+        <span class="ind-badge" id="badge-economy">Estable</span>
+      </div>
+      <div class="ind-value"><span id="val-economy">500</span><span> / 1000</span><span class="ind-delta" id="delta-economy"></span></div>
+      <div class="ind-bar-track"><div class="ind-bar-fill" id="bar-economy" style="width:50%; background:var(--economy);"></div></div>
+    </div>
+    <div class="ind-card" style="--dot-color:var(--wellbeing)">
+      <div class="ind-head">
+        <span class="ind-label">👥 Bienestar</span>
+        <span class="ind-badge" id="badge-wellbeing">Estable</span>
+      </div>
+      <div class="ind-value"><span id="val-wellbeing">500</span><span> / 1000</span><span class="ind-delta" id="delta-wellbeing"></span></div>
+      <div class="ind-bar-track"><div class="ind-bar-fill" id="bar-wellbeing" style="width:50%; background:var(--wellbeing);"></div></div>
+    </div>
+    <div class="ind-card" style="--dot-color:var(--planet)">
+      <div class="ind-head">
+        <span class="ind-label">🌎 Planeta</span>
+        <span class="ind-badge" id="badge-planet">Excelente</span>
+      </div>
+      <div class="ind-value"><span id="val-planet">1000</span><span> / 1000</span><span class="ind-delta" id="delta-planet"></span></div>
+      <div class="ind-bar-track"><div class="ind-bar-fill" id="bar-planet" style="width:100%; background:var(--planet);"></div></div>
+    </div>
+  </div>
+
+  <!-- ===================== MAIN LAYOUT ===================== -->
+  <div class="layout">
+
+    <!-- PLAYERS COLUMN -->
+    <div class="panel">
+      <h3>Jugadores</h3>
+      <div class="players-col" id="players-col"></div>
+    </div>
+
+    <!-- BOARD -->
+    <div class="panel board-panel">
+      <h3>Tablero — Distrito Central</h3>
+      <div class="board-frame">
+        <svg id="board-svg" viewBox="0 0 760 620" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div class="board-toolbar">
+        <div class="legend">
+          <span><i style="background:var(--c-lav-light)"></i>Disponible</span>
+          <span><i style="background:var(--c-green)"></i>Zona verde</span>
+          <span><i style="background:var(--c-slate)"></i>Construido</span>
+          <span><i style="background:#fff"></i>Casilla del avatar</span>
+          <span><i style="background:#1f7a44;border-radius:50%;"></i>Recuperable con zona verde</span>
+        </div>
+        <div id="parcel-hint" class="dice-hint">Selecciona una parcela disponible (o una recuperable, marcada con 🟢) durante la fase de Construcción.</div>
+      </div>
+    </div>
+
+    <!-- CONTROL / PHASE PANEL -->
+    <div class="panel phase-panel">
+      <h3>Control de turno</h3>
+      <div class="phase-steps">
+        <div class="phase-dot" data-phase="0"></div>
+        <div class="phase-dot" data-phase="1"></div>
+        <div class="phase-dot" data-phase="2"></div>
+        <div class="phase-dot" data-phase="3"></div>
+        <div class="phase-dot" data-phase="4"></div>
+      </div>
+      <div>
+        <p class="phase-title title-font" id="phase-title">Fase 1 · Ingresos</p>
+        <p class="phase-desc" id="phase-desc">Calculando ingresos del jugador…</p>
+      </div>
+
+      <div id="dice-block" style="display:none;">
+        <div class="dice-wrap">
+          <div class="die" id="die-face">?</div>
+          <div>
+            <button class="btn btn-primary" id="btn-roll">🎲 Tirar dado</button>
+            <div class="dice-hint">Tecla ESPACIO / ENTER</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="construction-block" style="display:none;">
+        <div class="constr-counter">
+          <span>Construcciones este turno</span>
+          <b><span id="constr-used">0</span> / 2</b>
+        </div>
+      </div>
+
+      <div id="action-block" style="display:none;"></div>
+
+      <div id="update-block" style="display:none;"></div>
+
+      <div class="btn-row">
+        <button class="btn btn-block btn-primary" id="btn-continue">Continuar</button>
+      </div>
+
+      <div class="panel log-panel" style="padding:10px;">
+        <h3 style="margin-bottom:6px;">Bitácora</h3>
+        <div id="log-list"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-note">Humans Inc. 2050 · Prototipo Vanilla JS — clic o teclado (Espacio/Enter) para jugar</div>
+</div>
+
+<!-- ===================== SETUP MODAL ===================== -->
+<div class="modal-overlay" id="setup-overlay">
+  <div class="modal">
+    <h2>Fundar la ciudad</h2>
+    <div class="sub">Configura la partida de Humans Inc. 2050 antes de empezar.</div>
+
+    <div class="setup-field">
+      <label>Número de jugadores (2–6)</label>
+      <select id="setup-players">
+        <option value="2">2 jugadores</option>
+        <option value="3">3 jugadores</option>
+        <option value="4" selected>4 jugadores</option>
+        <option value="5">5 jugadores</option>
+        <option value="6">6 jugadores</option>
+      </select>
+    </div>
+
+    <div class="setup-field">
+      <label>Dinero inicial por jugador ($)</label>
+      <input type="number" id="setup-money" value="400" min="100" step="10">
+    </div>
+
+    <div class="setup-field">
+      <label>Nombres de los jugadores</label>
+      <div class="player-name-rows" id="setup-names"></div>
+    </div>
+
+    <button class="btn btn-primary btn-block" id="btn-start-game">🏙️ Iniciar partida</button>
+  </div>
+</div>
+
+<!-- ===================== BUILD MODAL ===================== -->
+<div class="modal-overlay hidden" id="build-overlay">
+  <div class="modal">
+    <button class="close-x" id="build-close">✕</button>
+    <h2>Construir en parcela <span id="build-parcel-id"></span></h2>
+    <div class="sub" id="build-parcel-sub">Elige el tipo de construcción.</div>
+    <div class="build-grid" id="build-grid"></div>
+  </div>
+</div>
+
+<!-- ===================== UPGRADE / ACTION MODAL ===================== -->
+<div class="modal-overlay hidden" id="upgrade-overlay">
+  <div class="modal">
+    <button class="close-x" id="upgrade-close">✕</button>
+    <h2>Mejorar construcción</h2>
+    <div class="sub">Requiere 3 o más construcciones del mismo tipo. Costo fijo $80 · +50 puntos.</div>
+    <div class="build-grid" id="upgrade-grid"></div>
+  </div>
+</div>
+
+<!-- ===================== END GAME MODAL ===================== -->
+<div class="modal-overlay hidden" id="end-overlay">
+  <div class="modal">
+    <h2>🏁 Fin de la partida</h2>
+    <div class="sub" id="end-city-state">Estado final de la ciudad</div>
+    <div class="final-scores" id="final-scores"></div>
+    <button class="btn btn-primary btn-block" id="btn-restart">Jugar de nuevo</button>
+  </div>
+</div>
+
+<div class="toast-stack" id="toast-stack"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* =========================================================================
+   1. CONSTANTES DEL JUEGO
+   ========================================================================= */
+
+const MAX_ROUNDS = 10;
+const MAX_BUILDS_PER_TURN = 2;
+const INDICATOR_MIN = 0;
+const INDICATOR_MAX = 1000;
+const GREEN_ZONES_COUNT = 6;
+const ENV_RECOVERY_BONUS = 60;      // bono fijo por "recuperar" un edificio contaminante con zona verde
+const GREEN_ON_CITY_GREEN_PENALTY = -50; // penalización adicional si se construye sobre zona verde original
+const UPGRADE_COST = 80;
+const UPGRADE_POINTS = 50;
+const UPGRADE_MIN_SAME_TYPE = 3;
+const ECON_CRISIS_INCOME_PENALTY = 10;
+const SPECIAL_PROJECT_COST = 150;
+const SPECIAL_PROJECT_POINTS = 100;
+
+const PLAYER_COLORS = ["#2f8fd1","#e6672f","#86c443","#eecb3d","#eeb0c4","#9b9bd6"];
+
+// Tabla oficial de construcciones (sección 4 del reglamento)
+const BUILDING_TYPES = {
+  housing:   { key:"housing",   label:"Vivienda",    icon:"🏠", cost:100, economy: 40,  wellbeing: 100, planet: -20,  points: 50,  income:20 },
+  factory:   { key:"factory",   label:"Fábrica",     icon:"🏭", cost:150, economy:150,  wellbeing: -50, planet: -120, points: 80,  income:40 },
+  tech:      { key:"tech",      label:"Tecnología",  icon:"💻", cost:180, economy:180,  wellbeing:  60, planet: -20,  points: 100, income:50 },
+  transport: { key:"transport", label:"Transporte",  icon:"🚄", cost:220, economy: 60,  wellbeing: 120, planet:  80,  points: 90,  income:20 },
+  energy:    { key:"energy",    label:"Energía",     icon:"⚡", cost:200, economy:100,  wellbeing:  30, planet:  20,  points: 85,  income:35 },
+  commerce:  { key:"commerce",  label:"Comercio",    icon:"🛍️", cost:130, economy:120,  wellbeing:  70, planet: -40,  points: 75,  income:45 },
+  green:     { key:"green",     label:"Zona verde",  icon:"🌳", cost:300, economy: 10,  wellbeing: 150, planet:  200, points: 120, income:0  }
+};
+const BUILDING_KEYS = Object.keys(BUILDING_TYPES);
+
+// Color de casilla por tipo de construcción (paleta inspirada en el mosaico de referencia)
+const TYPE_COLOR = {
+  empty:     "#c3c3e8",  // lavanda claro = disponible
+  green:     "#1f7a44",
+  housing:   "#eeb0c4",
+  factory:   "#e6672f",
+  tech:      "#2f8fd1",
+  transport: "#eecb3d",
+  energy:    "#86c443",
+  commerce:  "#9b9bd6"
+};
+
+// Edificios "contaminantes" = impacto negativo en Planeta. Se usan para la
+// regla de "recuperación ambiental" (sección 8) al construir una zona verde encima.
+const CONTAMINATING_TYPES = BUILDING_KEYS.filter(k => BUILDING_TYPES[k].planet < 0);
+
+/* =========================================================================
+   2. GEOMETRÍA HEXAGONAL DEL TABLERO
+   -------------------------------------------------------------------------
+   El tablero digitaliza el mosaico de la imagen de referencia como una
+   "flor" de 19 hexágonos (radio 2, coordenadas axiales), rodeada por un
+   marco decorativo de triángulos de colores (no interactivo) que reproduce
+   el borde de vitral visto en game_image.jpeg.
+   ========================================================================= */
+
+const HEX_SIZE = 46;
+const BOARD_CX = 380, BOARD_CY = 300;
+
+// 6 direcciones axiales (orden fijo y consistente = "rueda" de giro del dado)
+const HEX_DIRS = [
+  {q: 1, r: 0}, {q: 1, r: -1}, {q: 0, r: -1},
+  {q: -1, r: 0}, {q: -1, r: 1}, {q: 0, r: 1}
+];
+
+function axialToPixel(q, r){
+  const x = HEX_SIZE * Math.sqrt(3) * (q + r/2) + BOARD_CX;
+  const y = HEX_SIZE * 1.5 * r + BOARD_CY;
+  return {x, y};
+}
+
+function hexCorners(cx, cy, size){
+  const pts = [];
+  for(let i=0;i<6;i++){
+    const angle = Math.PI/180 * (60*i - 30);
+    pts.push([cx + size*Math.cos(angle), cy + size*Math.sin(angle)]);
+  }
+  return pts;
+}
+
+function buildHexFlower(radius){
+  const cells = [];
+  for(let q=-radius; q<=radius; q++){
+    for(let r=-radius; r<=radius; r++){
+      if(Math.abs(q+r) <= radius){
+        cells.push({q, r});
+      }
+    }
+  }
+  return cells;
+}
+
+/* =========================================================================
+   3. ESTADO DEL JUEGO
+   ========================================================================= */
+
+let state = null;
+
+function freshCity(){
+  return { economy:500, wellbeing:500, planet:1000 };
+}
+
+function makeParcels(){
+  const cells = buildHexFlower(2); // 19 parcelas
+  const parcels = cells.map((c, i) => ({
+    id: "P" + (i+1),
+    q: c.q, r: c.r,
+    terrain: "empty",     // 'empty' | 'green' (zona verde original de ciudad)
+    occupied: false,
+    building: null,       // { type, owner, sustainable }
+  }));
+
+  // Seleccionar exactamente 6 zonas verdes iniciales, no adyacentes de forma
+  // repetitiva (simplemente aleatorias entre las 19 parcelas).
+  const idxs = parcels.map((_,i)=>i);
+  shuffle(idxs);
+  idxs.slice(0, GREEN_ZONES_COUNT).forEach(i => {
+    parcels[i].terrain = "green";
+    parcels[i].occupied = false; // disponible para construir encima (con penalización)
+  });
+
+  return parcels;
+}
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function makePlayers(names, startMoney){
+  return names.map((name, i) => ({
+    id: i,
+    name: name || ("Jugador " + (i+1)),
+    color: PLAYER_COLORS[i % PLAYER_COLORS.length],
+    money: startMoney,
+    individualPoints: 0,
+    buildings: [],       // array de parcelIds construidos por este jugador
+    avatarParcelIndex: null,
+    specialProjectUsed: false
+  }));
+}
+
+function newGame(names, startMoney){
+  const parcels = makeParcels();
+  const players = makePlayers(names, startMoney);
+  // posicionar avatares en parcelas distintas del anillo exterior
+  const outerIdxs = parcels.map((p,i)=>({p,i})).filter(o => Math.max(Math.abs(o.p.q),Math.abs(o.p.r),Math.abs(o.p.q+o.p.r))===2).map(o=>o.i);
+  shuffle(outerIdxs);
+  players.forEach((pl, i) => { pl.avatarParcelIndex = outerIdxs[i % outerIdxs.length]; });
+
+  return {
+    round: 1,
+    maxRounds: MAX_ROUNDS,
+    currentPlayerIndex: 0,
+    phaseIndex: 0, // 0 ingresos,1 planificacion,2 construccion,3 accion,4 actualizacion
+    phases: ["Ingresos","Planificación","Construcción","Acción","Actualización"],
+    players,
+    city: freshCity(),
+    parcels,
+    turn: {
+      buildsThisTurn: 0,
+      buildTypesThisTurn: [],
+      diceRolled: false,
+      lastRoll: null,
+      landedParcelIndex: null,
+      upgradeUsed: false,
+      incomeCollected: 0
+    },
+    envCrisisActive: false,
+    wellbeingCrisisActive: false,
+    econCrisisActive: false,
+    gameOver: false,
+    selectedParcelIndex: null
+  };
+}
+
+/* =========================================================================
+   4. UTILIDADES DE INDICADORES
+   ========================================================================= */
+
+function clampIndicator(v){
+  return Math.max(INDICATOR_MIN, Math.min(INDICATOR_MAX, Math.round(v)));
+}
+
+function applyCityDelta(economyD, wellbeingD, planetD){
+  const before = {...state.city};
+  state.city.economy = clampIndicator(state.city.economy + economyD);
+  state.city.wellbeing = clampIndicator(state.city.wellbeing + wellbeingD);
+  state.city.planet = clampIndicator(state.city.planet + planetD);
+  return before;
+}
+
+function indicatorStatus(v){
+  if(v>=800) return {label:"Excelente", cls:"good"};
+  if(v>=600) return {label:"Bueno", cls:"good"};
+  if(v>=400) return {label:"Estable", cls:"warn2"};
+  if(v>=200) return {label:"Crítico", cls:"warn"};
+  return {label:"Crisis", cls:"danger"};
+}
+
+/* =========================================================================
+   5. MOVIMIENTO DE DADO SOBRE EL TABLERO (INTERSECCIÓN A INTERSECCIÓN)
+   -------------------------------------------------------------------------
+   Regla (sección 1 del reglamento): el avatar avanza de intersección en
+   intersección, siempre girando hacia la derecha. Cuando hay varias
+   opciones de giro a la derecha válidas, se elige aleatoriamente entre ellas.
+
+   Implementación: cada parcela hexagonal es un nodo; sus 6 vecinos definen
+   las aristas ("calles"). Dado un sentido de entrada (dirIn, 0-5 según
+   HEX_DIRS), se consideran "giros a la derecha" las direcciones
+   (dirIn+1)%6 y (dirIn+2)%6 -- es decir, las dos direcciones inmediatamente
+   siguientes en el sentido fijo de la rueda de direcciones. Si ambas
+   existen como parcelas válidas del tablero, se sortea aleatoriamente entre
+   ellas. Si solo una existe, se toma esa. Si ninguna existe, se cae en
+   opciones de respaldo (seguir recto, y en última instancia retroceder)
+   para nunca dejar al avatar sin movimiento.
+   ========================================================================= */
+
+function parcelIndexByAxial(q, r){
+  return state.parcels.findIndex(p => p.q===q && p.r===r);
+}
+
+function neighborIndex(parcelIndex, dir){
+  const p = state.parcels[parcelIndex];
+  const d = HEX_DIRS[dir];
+  return parcelIndexByAxial(p.q + d.q, p.r + d.r);
+}
+
+function stepAvatar(parcelIndex, dirIn){
+  // dirIn puede ser null en el primer paso del juego (sin dirección previa)
+  let candidates = [];
+  if(dirIn === null){
+    // sin historial: cualquier vecino existente es válido
+    for(let d=0; d<6; d++){
+      const ni = neighborIndex(parcelIndex, d);
+      if(ni !== -1) candidates.push({idx:ni, dir:d});
+    }
+  } else {
+    const rightOptions = [(dirIn+1)%6, (dirIn+2)%6];
+    rightOptions.forEach(d => {
+      const ni = neighborIndex(parcelIndex, d);
+      if(ni !== -1) candidates.push({idx:ni, dir:d});
+    });
+    if(candidates.length === 0){
+      // respaldo: seguir recto
+      const ni = neighborIndex(parcelIndex, dirIn);
+      if(ni !== -1) candidates.push({idx:ni, dir:dirIn});
+    }
+    if(candidates.length === 0){
+      // respaldo final: cualquier vecino excepto retroceder directo
+      const back = (dirIn+3)%6;
+      for(let d=0; d<6; d++){
+        if(d===back) continue;
+        const ni = neighborIndex(parcelIndex, d);
+        if(ni !== -1) candidates.push({idx:ni, dir:d});
+      }
+    }
+    if(candidates.length === 0){
+      // último recurso: retroceder
+      const ni = neighborIndex(parcelIndex, (dirIn+3)%6);
+      if(ni !== -1) candidates.push({idx:ni, dir:(dirIn+3)%6});
+    }
+  }
+  if(candidates.length === 0) return {idx:parcelIndex, dir:dirIn}; // aislado, no debería pasar
+  const choice = candidates[Math.floor(Math.random()*candidates.length)];
+  return {idx:choice.idx, dir:choice.dir};
+}
+
+function moveAvatar(player, steps){
+  let pos = player.avatarParcelIndex;
+  let dir = player.lastDir === undefined ? null : player.lastDir;
+  const path = [pos];
+  for(let i=0;i<steps;i++){
+    const res = stepAvatar(pos, dir);
+    pos = res.idx; dir = res.dir;
+    path.push(pos);
+  }
+  player.avatarParcelIndex = pos;
+  player.lastDir = dir;
+  return path;
+}
+
+/* =========================================================================
+   6. LÓGICA DE JUEGO — FASES DE TURNO
+   ========================================================================= */
+
+function currentPlayer(){ return state.players[state.currentPlayerIndex]; }
+
+function playerBuildingsOfType(player, type){
+  return player.buildings
+    .map(pid => state.parcels.find(p=>p.id===pid))
+    .filter(p => p && p.building && p.building.type === type);
+}
+
+// ---- FASE 1: INGRESOS ----
+function collectIncome(){
+  const pl = currentPlayer();
+  let total = 0;
+  pl.buildings.forEach(pid => {
+    const parcel = state.parcels.find(p=>p.id===pid);
+    if(parcel && parcel.building){
+      total += BUILDING_TYPES[parcel.building.type].income;
+    }
+  });
+  let penalty = 0;
+  if(state.econCrisisActive && total > 0){
+    penalty = Math.min(ECON_CRISIS_INCOME_PENALTY, total);
+    total -= penalty;
+  }
+  pl.money += total;
+  state.turn.incomeCollected = total;
+  return {total, penalty};
+}
+
+// ---- FASE 3: CONSTRUCCIÓN ----
+function canBuildAt(parcelIndex){
+  const parcel = state.parcels[parcelIndex];
+  if(!parcel) return {ok:false, reason:"Parcela inválida."};
+  if(parcel.occupied) return {ok:false, reason:"Parcela ya ocupada."};
+  if(state.turn.buildsThisTurn >= MAX_BUILDS_PER_TURN) return {ok:false, reason:"Ya construiste el máximo de 2 este turno."};
+  return {ok:true};
+}
+
+function canBuildType(typeKey){
+  if(typeKey === "green") return {ok:true}; // exento de la restricción de categoría repetida
+  if(state.turn.buildTypesThisTurn.includes(typeKey)){
+    return {ok:false, reason:"Ya construiste esta categoría en este turno (excepto zonas verdes)."};
+  }
+  return {ok:true};
+}
+
+function performBuild(parcelIndex, typeKey){
+  const parcel = state.parcels[parcelIndex];
+  const type = BUILDING_TYPES[typeKey];
+  const pl = currentPlayer();
+
+  const buildCheck = canBuildAt(parcelIndex);
+  if(!buildCheck.ok) return {ok:false, reason:buildCheck.reason};
+  const typeCheck = canBuildType(typeKey);
+  if(!typeCheck.ok) return {ok:false, reason:typeCheck.reason};
+  if(pl.money < type.cost) return {ok:false, reason:"Dinero insuficiente."};
+
+  let planetDelta = type.planet;
+  let pointsGained = type.points;
+  let recovered = false;
+  let onCityGreen = false;
+
+  // Regla: construir sobre una zona verde original de la ciudad -> penalización adicional
+  if(parcel.terrain === "green" && typeKey !== "green"){
+    planetDelta += GREEN_ON_CITY_GREEN_PENALTY;
+    onCityGreen = true;
+  }
+
+  // Regla: recuperación ambiental — una zona verde reemplaza un edificio contaminante
+  if(typeKey === "green" && parcel.occupied === false && parcel.building === null){
+    // construir sobre parcela vacía normal: sin bono de recuperación
+  }
+
+  pl.money -= type.cost;
+  applyCityDelta(type.economy, type.wellbeing, planetDelta);
+  pl.individualPoints += pointsGained;
+
+  parcel.occupied = true;
+  parcel.building = { type: typeKey, owner: pl.id, sustainable:false };
+  parcel.terrain = typeKey === "green" ? "green" : "built";
+  pl.buildings.push(parcel.id);
+
+  state.turn.buildsThisTurn += 1;
+  state.turn.buildTypesThisTurn.push(typeKey);
+
+  return {ok:true, planetDelta, pointsGained, onCityGreen, recovered};
+}
+
+// Recuperación ambiental: reemplazar un edificio contaminante existente con zona verde
+function performRecovery(parcelIndex){
+  const parcel = state.parcels[parcelIndex];
+  const pl = currentPlayer();
+  const type = BUILDING_TYPES.green;
+
+  if(!parcel.occupied || !parcel.building) return {ok:false, reason:"La parcela no tiene una construcción para recuperar."};
+  if(!CONTAMINATING_TYPES.includes(parcel.building.type)) return {ok:false, reason:"Esa construcción no es contaminante."};
+  if(state.turn.buildsThisTurn >= MAX_BUILDS_PER_TURN) return {ok:false, reason:"Ya construiste el máximo de 2 este turno."};
+  const typeCheck = canBuildType("green");
+  if(!typeCheck.ok) return {ok:false, reason:typeCheck.reason};
+  if(pl.money < type.cost) return {ok:false, reason:"Dinero insuficiente."};
+
+  // remover propiedad anterior
+  const prevOwner = state.players.find(p=>p.id===parcel.building.owner);
+  if(prevOwner){
+    prevOwner.buildings = prevOwner.buildings.filter(pid => pid !== parcel.id);
+  }
+
+  pl.money -= type.cost;
+  applyCityDelta(type.economy, type.wellbeing, type.planet);
+  const pointsGained = type.points + ENV_RECOVERY_BONUS;
+  pl.individualPoints += pointsGained;
+
+  parcel.building = { type:"green", owner: pl.id, sustainable:false };
+  parcel.terrain = "green";
+  parcel.occupied = true;
+  pl.buildings.push(parcel.id);
+
+  state.turn.buildsThisTurn += 1;
+  state.turn.buildTypesThisTurn.push("green");
+
+  return {ok:true, pointsGained};
+}
+
+// ---- FASE 4: ACCIÓN — MEJORA SOSTENIBLE ----
+function computeSustainableStats(typeKey){
+  const base = BUILDING_TYPES[typeKey];
+  return {
+    economy: Math.round(base.economy * 0.8),
+    wellbeing: base.wellbeing + 60,
+    planet: base.planet + 90,
+    cost: UPGRADE_COST,
+    points: UPGRADE_POINTS
+  };
+}
+
+function canUpgradeType(player, typeKey){
+  const owned = playerBuildingsOfType(player, typeKey).filter(p=>!p.building.sustainable);
+  return owned.length >= UPGRADE_MIN_SAME_TYPE;
+}
+
+function performUpgrade(parcelId){
+  const pl = currentPlayer();
+  const parcel = state.parcels.find(p=>p.id===parcelId);
+  if(!parcel || !parcel.building) return {ok:false, reason:"Parcela inválida."};
+  if(parcel.building.owner !== pl.id) return {ok:false, reason:"No te pertenece."};
+  if(parcel.building.sustainable) return {ok:false, reason:"Ya es sostenible."};
+  if(state.turn.upgradeUsed) return {ok:false, reason:"Ya usaste tu acción de este turno."};
+  if(!canUpgradeType(pl, parcel.building.type)) return {ok:false, reason:"Necesitas 3+ construcciones del mismo tipo."};
+  const stats = computeSustainableStats(parcel.building.type);
+  if(pl.money < stats.cost) return {ok:false, reason:"Dinero insuficiente."};
+
+  const base = BUILDING_TYPES[parcel.building.type];
+  pl.money -= stats.cost;
+  // delta = version sostenible - version base (la base ya fue aplicada al construir)
+  applyCityDelta(stats.economy - base.economy, stats.wellbeing - base.wellbeing, stats.planet - base.planet);
+  pl.individualPoints += stats.points;
+  parcel.building.sustainable = true;
+  state.turn.upgradeUsed = true;
+
+  return {ok:true, stats};
+}
+
+// ---- FASE 4: ACCIÓN — PROYECTO ESPECIAL ----
+// Extensión razonable del reglamento: la tabla de puntuación (sección 14)
+// incluye "Proyecto especial +100" sin definir mecánica ni costo explícitos.
+// Se implementa como una acción opcional, única por jugador en toda la
+// partida, para completar ese punto de la tabla sin inventar mecánicas
+// ajenas al reglamento.
+function performSpecialProject(){
+  const pl = currentPlayer();
+  if(pl.specialProjectUsed) return {ok:false, reason:"Ya usaste tu proyecto especial en esta partida."};
+  if(state.turn.upgradeUsed) return {ok:false, reason:"Ya usaste tu acción de este turno."};
+  if(pl.money < SPECIAL_PROJECT_COST) return {ok:false, reason:"Dinero insuficiente."};
+  pl.money -= SPECIAL_PROJECT_COST;
+  pl.individualPoints += SPECIAL_PROJECT_POINTS;
+  pl.specialProjectUsed = true;
+  state.turn.upgradeUsed = true;
+  return {ok:true};
+}
+
+// ---- FASE 5: ACTUALIZACIÓN — CRISIS (por ronda) ----
+function applyRoundEndCrises(){
+  const events = [];
+  if(state.city.planet < 200){
+    applyCityDelta(0, -20, -30);
+    state.envCrisisActive = true;
+    events.push("🌎 Crisis ambiental activa: Planeta −30, Bienestar −20.");
+  } else state.envCrisisActive = false;
+
+  if(state.city.wellbeing < 200){
+    applyCityDelta(-20, -30, 0);
+    state.wellbeingCrisisActive = true;
+    events.push("👥 Crisis de bienestar activa: Bienestar −30, Economía −20.");
+  } else state.wellbeingCrisisActive = false;
+
+  if(state.city.economy < 200){
+    applyCityDelta(-30, 0, 0);
+    state.econCrisisActive = true;
+    events.push("💰 Crisis económica activa: Economía −30, ingresos reducidos $10.");
+  } else state.econCrisisActive = false;
+
+  return events;
+}
+
+// ---- FIN DE PARTIDA — PUNTUACIÓN ----
+function cityBonusTier(){
+  const {economy, wellbeing, planet} = state.city;
+  const vals = [economy, wellbeing, planet];
+  if(vals.some(v=>v<200)) return {label:"Ciudad en crisis", bonus:-100, cls:"danger"};
+  if(vals.some(v=>v<500)) return {label:"Ciudad inestable", bonus:0, cls:"warn"};
+  if(vals.every(v=>v>=700)) return {label:"Ciudad excelente", bonus:200, cls:"good"};
+  return {label:"Ciudad equilibrada", bonus:100, cls:"good"};
+}
+
+function computeFinalScores(){
+  const tier = cityBonusTier();
+  return state.players.map(pl => ({
+    id: pl.id, name: pl.name, color: pl.color,
+    individualPoints: pl.individualPoints,
+    bonus: tier.bonus,
+    final: pl.individualPoints + tier.bonus
+  })).sort((a,b) => b.final - a.final);
+}
+
+/* =========================================================================
+   7. VALIDACIÓN INTERNA DEL JUEGO (auto-test antes de exponer la UI)
+   -------------------------------------------------------------------------
+   Verifica invariantes clave del reglamento sobre un estado de prueba
+   aislado (no afecta la partida real). Si algo falla, se registra en
+   consola pero el juego continúa (para no bloquear al usuario).
+   ========================================================================= */
+function runInternalValidation(){
+  const results = [];
+  const original = state;
+  try{
+    state = newGame(["T1","T2"], 1000);
+
+    // 1) Indicadores iniciales correctos
+    results.push(["Indicadores iniciales", state.city.economy===500 && state.city.wellbeing===500 && state.city.planet===1000]);
+
+    // 2) Exactamente 6 zonas verdes iniciales
+    results.push(["6 zonas verdes iniciales", state.parcels.filter(p=>p.terrain==="green").length === GREEN_ZONES_COUNT]);
+
+    // 3) 19 parcelas en total
+    results.push(["19 parcelas hexagonales", state.parcels.length === 19]);
+
+    // 4) Clamping de indicadores 0-1000
+    applyCityDelta(-9999, 9999, 0);
+    results.push(["Clamp de indicadores 0-1000", state.city.economy===0 && state.city.wellbeing===1000]);
+    state.city = freshCity();
+
+    // 5) Construcción básica: fábrica aplica costo/efectos correctos
+    const emptyIdx = state.parcels.findIndex(p=>p.terrain==="empty" && !p.occupied);
+    const before = {...state.city};
+    const pl = currentPlayer();
+    const money0 = pl.money;
+    const r = performBuild(emptyIdx, "factory");
+    results.push(["Construcción de fábrica exitosa", r.ok===true]);
+    results.push(["Costo de fábrica descontado ($150)", pl.money === money0-150]);
+    results.push(["Economía +150 tras fábrica", state.city.economy === before.economy+150]);
+    results.push(["Puntos jugador +80 tras fábrica", pl.individualPoints === 80]);
+
+    // 6) Restricción: no se puede repetir categoría en el mismo turno (excepto verde)
+    const emptyIdx2 = state.parcels.findIndex((p,i)=>p.terrain==="empty" && !p.occupied);
+    const r2 = performBuild(emptyIdx2, "factory");
+    results.push(["Bloquea repetir categoría no-verde en el turno", r2.ok===false]);
+
+    // 7) Verde exento de la restricción de categoría
+    state.turn.buildsThisTurn = 0; // simular nuevo turno para probar límite de 2, no de categoría
+    const greenIdx1 = state.parcels.findIndex(p=>p.terrain==="empty" && !p.occupied);
+    performBuild(greenIdx1, "green");
+    const greenIdx2 = state.parcels.findIndex(p=>p.terrain==="empty" && !p.occupied);
+    const rGreen2 = performBuild(greenIdx2, "green");
+    results.push(["Zona verde exenta de restricción de categoría", rGreen2.ok===true]);
+
+    // 8) Límite de 2 construcciones por turno
+    const emptyIdx3 = state.parcels.findIndex(p=>p.terrain==="empty" && !p.occupied);
+    const r3 = performBuild(emptyIdx3, "tech");
+    results.push(["Bloquea 3ra construcción en el turno", r3.ok===false]);
+
+    // 9) Penalización por construir sobre zona verde original
+    state = newGame(["T1","T2"], 1000);
+    const cityGreenIdx = state.parcels.findIndex(p=>p.terrain==="green");
+    const beforePlanet = state.city.planet;
+    const rGreenBuild = performBuild(cityGreenIdx, "housing");
+    const expectedPlanetDelta = BUILDING_TYPES.housing.planet + GREEN_ON_CITY_GREEN_PENALTY; // -20-50=-70
+    results.push(["Penalización -50 Planeta por construir sobre zona verde", state.city.planet === clampIndicator(beforePlanet+expectedPlanetDelta)]);
+
+    // 10) Recuperación ambiental: zona verde reemplaza edificio contaminante
+    state = newGame(["T1","T2"], 2000);
+    const pIdx = state.parcels.findIndex(p=>p.terrain==="empty" && !p.occupied);
+    performBuild(pIdx, "factory"); // contaminante
+    state.turn.buildsThisTurn = 0; state.turn.buildTypesThisTurn = [];
+    const parcelObj = state.parcels[pIdx];
+    const ptsBefore = currentPlayer().individualPoints;
+    const rec = performRecovery(pIdx);
+    results.push(["Recuperación ambiental exitosa", rec.ok===true]);
+    results.push(["Bono de recuperación = 120+60=180 puntos", (currentPlayer().individualPoints - ptsBefore) === (BUILDING_TYPES.green.points+ENV_RECOVERY_BONUS)]);
+    results.push(["Parcela recuperada queda como verde", parcelObj.terrain==="green" && parcelObj.building.type==="green"]);
+
+    // 11) Mejora sostenible requiere 3+ construcciones del mismo tipo
+    state = newGame(["T1"], 5000);
+    const pl2 = currentPlayer();
+    for(let i=0;i<3;i++){
+      state.turn.buildsThisTurn = 0; state.turn.buildTypesThisTurn = [];
+      const idx = state.parcels.findIndex(p=>p.terrain==="empty" && !p.occupied);
+      performBuild(idx, "factory");
+    }
+    results.push(["3 fábricas construidas para habilitar mejora", playerBuildingsOfType(pl2,"factory").length===3]);
+    const upgradeCheck = canUpgradeType(pl2, "factory");
+    results.push(["Mejora habilitada con 3+ del mismo tipo", upgradeCheck===true]);
+    const targetParcelId = playerBuildingsOfType(pl2,"factory")[0].id;
+    const moneyBeforeUpgrade = pl2.money;
+    const upRes = performUpgrade(targetParcelId);
+    results.push(["Mejora ejecutada correctamente", upRes.ok===true]);
+    results.push(["Costo de mejora $80 descontado", pl2.money === moneyBeforeUpgrade-80]);
+
+    // 12) Crisis: economía < 200 reduce ingresos en $10 (ejemplo del reglamento)
+    state = newGame(["T1"], 1000);
+    state.city.economy = 150;
+    state.econCrisisActive = true;
+    const plX = currentPlayer();
+    // construir 3 viviendas + 1 comercio simuladas manualmente para el ejemplo de ingresos
+    plX.buildings = [];
+    ["housing","housing","housing","commerce"].forEach((t,i)=>{
+      const parcel = state.parcels[i];
+      parcel.occupied = true;
+      parcel.building = {type:t, owner:plX.id, sustainable:false};
+      parcel.terrain = "built";
+      plX.buildings.push(parcel.id);
+    });
+    plX.money = 0;
+    const incomeResult = collectIncome();
+    results.push(["Ejemplo reglamento: ingreso $105 con crisis -> $95", plX.money===95]);
+
+    // 13) Bono final por estado de ciudad — caso 'excelente'
+    state = newGame(["T1","T2"], 100);
+    state.city = {economy:750, wellbeing:750, planet:750};
+    results.push(["Bono ciudad excelente = +200", cityBonusTier().bonus===200]);
+    state.city = {economy:550, wellbeing:600, planet:520};
+    results.push(["Bono ciudad equilibrada = +100", cityBonusTier().bonus===100]);
+    state.city = {economy:300, wellbeing:600, planet:520};
+    results.push(["Bono ciudad inestable = +0", cityBonusTier().bonus===0]);
+    state.city = {economy:100, wellbeing:600, planet:520};
+    results.push(["Bono ciudad en crisis = -100", cityBonusTier().bonus===-100]);
+
+    // 14) Movimiento del dado siempre aterriza en una parcela válida del grafo
+    state = newGame(["T1"], 500);
+    const p0 = currentPlayer();
+    let moveOk = true;
+    for(let t=0;t<25;t++){
+      const steps = 1+Math.floor(Math.random()*6);
+      moveAvatar(p0, steps);
+      if(p0.avatarParcelIndex<0 || p0.avatarParcelIndex>=state.parcels.length) moveOk=false;
+    }
+    results.push(["Movimiento de dado siempre válido tras 25 tiradas", moveOk]);
+
+  } catch(err){
+    results.push(["Excepción durante validación: " + err.message, false]);
+  } finally {
+    state = original;
+  }
+
+  const failed = results.filter(r=>r[1]!==true);
+  console.groupCollapsed("%cHumans Inc. 2050 — Validación interna (" + results.length + " chequeos)", "color:#8f8fd8;font-weight:bold;");
+  results.forEach(([name, ok]) => {
+    console.log((ok? "✅ " : "❌ ") + name);
+  });
+  console.groupEnd();
+  if(failed.length){
+    console.warn("Validación interna: " + failed.length + " chequeo(s) fallido(s).", failed);
+  } else {
+    console.log("%cValidación interna: TODOS los chequeos pasaron ("+results.length+"/"+results.length+").", "color:#4fbd7d;font-weight:bold;");
+  }
+  return {total:results.length, failed:failed.length};
+}
+
+/* =========================================================================
+   8. RENDER — INDICADORES
+   ========================================================================= */
+
+function renderIndicators(){
+  ["economy","wellbeing","planet"].forEach(key=>{
+    const v = state.city[key];
+    document.getElementById("val-"+key).textContent = v;
+    document.getElementById("bar-"+key).style.width = (v/10)+"%";
+    const st = indicatorStatus(v);
+    const badge = document.getElementById("badge-"+key);
+    badge.textContent = st.label;
+    badge.style.background = st.cls==="good" ? "rgba(79,189,125,.18)" : st.cls==="warn2" ? "rgba(238,203,61,.18)" : st.cls==="warn" ? "rgba(230,161,58,.2)" : "rgba(229,84,74,.2)";
+    badge.style.color = st.cls==="good" ? "var(--good)" : st.cls==="warn2" ? "var(--economy)" : st.cls==="warn" ? "var(--warn)" : "var(--danger)";
+  });
+}
+
+/* =========================================================================
+   9. RENDER — TABLERO SVG
+   ========================================================================= */
+
+function drawDecoBorder(svg){
+  // Marco decorativo de triángulos de colores, inspirado en el borde del
+  // mosaico de la imagen de referencia. Puramente estético (no interactivo).
+  const colors = ["#e6672f","#eecb3d","#86c443","#1f7a44","#2f8fd1","#eeb0c4","#9b9bd6"];
+  const cx = BOARD_CX, cy = BOARD_CY;
+  const outerR = HEX_SIZE*4.35;
+  const innerR = HEX_SIZE*3.55;
+  const n = 16;
+  let colorIdx = 0;
+  for(let i=0;i<n;i++){
+    const a1 = (Math.PI*2*i)/n - Math.PI/2;
+    const a2 = (Math.PI*2*(i+1))/n - Math.PI/2;
+    const amid = (a1+a2)/2;
+    const x1 = cx + innerR*Math.cos(a1), y1 = cy + innerR*Math.sin(a1)*0.86;
+    const x2 = cx + innerR*Math.cos(a2), y2 = cy + innerR*Math.sin(a2)*0.86;
+    const x3 = cx + outerR*Math.cos(amid), y3 = cy + outerR*Math.sin(amid)*0.86;
+    const tri = document.createElementNS("http://www.w3.org/2000/svg","polygon");
+    tri.setAttribute("points", `${x1},${y1} ${x2},${y2} ${x3},${y3}`);
+    tri.setAttribute("class","deco-tri");
+    tri.setAttribute("fill", colors[colorIdx % colors.length]);
+    tri.setAttribute("opacity", "0.85");
+    svg.appendChild(tri);
+    colorIdx++;
+  }
+}
+
+function parcelFillColor(parcel){
+  if(parcel.building){
+    return TYPE_COLOR[parcel.building.type];
+  }
+  if(parcel.terrain === "green") return TYPE_COLOR.green;
+  return TYPE_COLOR.empty;
+}
+
+function renderBoard(){
+  const svg = document.getElementById("board-svg");
+  svg.innerHTML = "";
+  drawDecoBorder(svg);
+
+  const bg = document.createElementNS("http://www.w3.org/2000/svg","circle");
+  bg.setAttribute("cx", BOARD_CX); bg.setAttribute("cy", BOARD_CY);
+  bg.setAttribute("r", HEX_SIZE*3.65);
+  bg.setAttribute("fill", "#a89d80");
+  svg.appendChild(bg);
+
+  const isConstructionPhase = state.phases[state.phaseIndex] === "Construcción" && !state.gameOver;
+
+  state.parcels.forEach((parcel, idx) => {
+    const {x,y} = axialToPixel(parcel.q, parcel.r);
+    const g = document.createElementNS("http://www.w3.org/2000/svg","g");
+    g.setAttribute("class","hex-group");
+    if(idx === currentPlayer().avatarParcelIndex) g.classList.add("landed");
+    if(idx === state.selectedParcelIndex) g.classList.add("selected");
+
+    const isRecoverable = parcel.occupied && parcel.building && CONTAMINATING_TYPES.includes(parcel.building.type);
+    const isClickable = isConstructionPhase && (!parcel.occupied || isRecoverable);
+
+    const poly = document.createElementNS("http://www.w3.org/2000/svg","polygon");
+    const pts = hexCorners(x,y,HEX_SIZE-2).map(p=>p.join(",")).join(" ");
+    poly.setAttribute("points", pts);
+    poly.setAttribute("fill", parcelFillColor(parcel));
+    poly.setAttribute("class", "hex-poly" + (isClickable ? " selectable" : parcel.occupied ? " unavailable" : ""));
+    poly.addEventListener("click", () => onParcelClick(idx));
+    g.appendChild(poly);
+
+    if(isRecoverable && isConstructionPhase){
+      const badge = document.createElementNS("http://www.w3.org/2000/svg","circle");
+      badge.setAttribute("cx", x+HEX_SIZE-14); badge.setAttribute("cy", y-HEX_SIZE+16); badge.setAttribute("r", 7);
+      badge.setAttribute("fill", "#1f7a44"); badge.setAttribute("stroke","#fff"); badge.setAttribute("stroke-width","1.5");
+      badge.setAttribute("pointer-events","none");
+      g.appendChild(badge);
+    }
+
+    if(parcel.building && parcel.building.owner !== undefined){
+      const owner = state.players[parcel.building.owner];
+      if(owner){
+        const ring = document.createElementNS("http://www.w3.org/2000/svg","polygon");
+        ring.setAttribute("points", hexCorners(x,y,HEX_SIZE-6).map(p=>p.join(",")).join(" "));
+        ring.setAttribute("class","hex-owner-ring");
+        ring.setAttribute("stroke", owner.color);
+        ring.setAttribute("fill","none");
+        g.appendChild(ring);
+      }
+    }
+
+    const icon = document.createElementNS("http://www.w3.org/2000/svg","text");
+    icon.setAttribute("x", x); icon.setAttribute("y", y+5);
+    icon.setAttribute("text-anchor","middle");
+    icon.setAttribute("class","hex-icon");
+    icon.textContent = parcel.building ? BUILDING_TYPES[parcel.building.type].icon + (parcel.building.sustainable?"♻":"") : (parcel.terrain==="green" ? "🌳" : "");
+    g.appendChild(icon);
+
+    svg.appendChild(g);
+  });
+
+  // Avatares de todos los jugadores
+  state.players.forEach(pl => {
+    const parcel = state.parcels[pl.avatarParcelIndex];
+    if(!parcel) return;
+    const {x,y} = axialToPixel(parcel.q, parcel.r);
+    const offsetAngle = (pl.id * 60) * Math.PI/180;
+    const ox = x + Math.cos(offsetAngle)*14;
+    const oy = y + Math.sin(offsetAngle)*14 - 18;
+    const av = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    av.setAttribute("cx", ox); av.setAttribute("cy", oy); av.setAttribute("r", 7);
+    av.setAttribute("fill", pl.color);
+    av.setAttribute("stroke", "#0e1015"); av.setAttribute("stroke-width","2");
+    av.setAttribute("class","avatar");
+    svg.appendChild(av);
+  });
+}
+
+function onParcelClick(idx){
+  if(state.gameOver) return;
+  if(state.phases[state.phaseIndex] !== "Construcción") return;
+  const parcel = state.parcels[idx];
+  const isRecoverable = parcel.occupied && parcel.building && CONTAMINATING_TYPES.includes(parcel.building.type);
+
+  if(parcel.occupied && !isRecoverable){
+    toast("Parcela ya ocupada y no es recuperable (no es una construcción contaminante).", "warn");
+    return;
+  }
+
+  state.selectedParcelIndex = idx;
+  if(isRecoverable){
+    openRecoveryModal(idx);
+  } else {
+    openBuildModal(idx);
+  }
+}
+
+function openRecoveryModal(parcelIndex){
+  const parcel = state.parcels[parcelIndex];
+  const pl = currentPlayer();
+  const currentType = BUILDING_TYPES[parcel.building.type];
+  const green = BUILDING_TYPES.green;
+
+  document.getElementById("build-parcel-id").textContent = parcel.id;
+  document.getElementById("build-parcel-sub").textContent =
+    `🌳 Recuperación ambiental: reemplaza la ${currentType.label.toLowerCase()} existente (dueño: ${state.players.find(p=>p.id===parcel.building.owner)?.name || "?"}) por una Zona verde. Bono de recuperación: +${ENV_RECOVERY_BONUS} puntos.`;
+
+  const grid = document.getElementById("build-grid");
+  grid.innerHTML = "";
+
+  const typeCheck = canBuildType("green");
+  const affordable = pl.money >= green.cost;
+  const disabled = !typeCheck.ok || !affordable;
+
+  const btn = document.createElement("button");
+  btn.className = "build-option";
+  btn.disabled = disabled;
+  btn.title = !typeCheck.ok ? typeCheck.reason : !affordable ? "Dinero insuficiente." : "";
+  btn.innerHTML = `
+    <div class="bo-head"><span>🌳 Recuperar con Zona verde</span><span class="bo-cost">$${green.cost}</span></div>
+    <div class="bo-stats">
+      <span class="stat-pill pos">💰+${green.economy}</span>
+      <span class="stat-pill pos">👥+${green.wellbeing}</span>
+      <span class="stat-pill pos">🌎+${green.planet}</span>
+      <span class="stat-pill pos">🏆+${green.points+ENV_RECOVERY_BONUS} (incluye bono)</span>
+    </div>
+  `;
+  btn.addEventListener("click", () => {
+    const res = performRecovery(parcelIndex);
+    if(res.ok){
+      toast(`🌳 Recuperación ambiental completada en ${parcel.id} (+${res.pointsGained} pts).`, "good");
+      logEvent("Recuperación", `${pl.name} recuperó ${parcel.id} con una zona verde (+${res.pointsGained} pts).`);
+      closeModal("build-overlay");
+      fullRender();
+    } else {
+      toast(res.reason, "warn");
+    }
+  });
+  grid.appendChild(btn);
+
+  document.getElementById("build-overlay").classList.remove("hidden");
+}
+
+/* =========================================================================
+   10. RENDER — JUGADORES
+   ========================================================================= */
+
+function renderPlayers(){
+  const col = document.getElementById("players-col");
+  col.innerHTML = "";
+  state.players.forEach((pl, i) => {
+    const card = document.createElement("div");
+    card.className = "player-card" + (i===state.currentPlayerIndex && !state.gameOver ? " active" : "");
+    card.style.setProperty("--player-color", pl.color);
+    card.innerHTML = `
+      <div class="player-top">
+        <span class="player-dot"></span>
+        <span class="player-name">${escapeHtml(pl.name)}</span>
+        ${i===state.currentPlayerIndex && !state.gameOver ? '<span class="player-turn-tag">En turno</span>' : ""}
+      </div>
+      <div class="player-stats">
+        <div class="pstat"><span class="lbl">💵 Dinero</span><b>$${pl.money}</b></div>
+        <div class="pstat"><span class="lbl">🏆 Puntos</span><b>${pl.individualPoints}</b></div>
+      </div>
+      <div class="player-buildings">
+        ${pl.buildings.length===0 ? '<span style="color:var(--text-faint);font-size:11px;">Sin construcciones aún</span>' :
+          pl.buildings.map(pid=>{
+            const parcel = state.parcels.find(p=>p.id===pid);
+            const t = BUILDING_TYPES[parcel.building.type];
+            return `<span class="bchip" title="${t.label}">${t.icon}${parcel.building.sustainable?"♻":""}</span>`;
+          }).join("")}
+      </div>
+    `;
+    col.appendChild(card);
+  });
+}
+
+function escapeHtml(str){
+  const d = document.createElement("div");
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+/* =========================================================================
+   11. RENDER — PANEL DE FASE / CONTROLES
+   ========================================================================= */
+
+const PHASE_INFO = [
+  { title:"Fase 1 · Ingresos", desc:"Se calculan automáticamente los ingresos generados por tus construcciones." },
+  { title:"Fase 2 · Planificación", desc:"Tira el dado para mover tu avatar por el tablero (intersección a intersección, siempre a la derecha)." },
+  { title:"Fase 3 · Construcción", desc:"Elige hasta 2 parcelas disponibles para construir. No puedes repetir categoría (excepto zonas verdes)." },
+  { title:"Fase 4 · Acción", desc:"Opcionalmente mejora una construcción a su versión sostenible, o realiza recuperación ambiental / proyecto especial." },
+  { title:"Fase 5 · Actualización", desc:"Se revisan los indicadores colectivos y posibles estados de crisis." }
+];
+
+function renderPhasePanel(){
+  document.querySelectorAll(".phase-dot").forEach((dot,i)=>{
+    dot.classList.toggle("active", i===state.phaseIndex);
+    dot.classList.toggle("done", i<state.phaseIndex);
+  });
+  document.getElementById("phase-title").textContent = PHASE_INFO[state.phaseIndex].title;
+  document.getElementById("phase-desc").textContent = PHASE_INFO[state.phaseIndex].desc;
+
+  document.getElementById("dice-block").style.display = "none";
+  document.getElementById("construction-block").style.display = "none";
+  document.getElementById("action-block").style.display = "none";
+  document.getElementById("update-block").style.display = "none";
+
+  const btnContinue = document.getElementById("btn-continue");
+  btnContinue.disabled = false;
+
+  const phaseName = state.phases[state.phaseIndex];
+
+  if(phaseName === "Ingresos"){
+    btnContinue.textContent = "Continuar a Planificación →";
+  }
+  else if(phaseName === "Planificación"){
+    document.getElementById("dice-block").style.display = "block";
+    btnContinue.textContent = "Continuar a Construcción →";
+    btnContinue.disabled = !state.turn.diceRolled;
+    if(!state.turn.diceRolled){
+      btnContinue.title = "Tira el dado primero.";
+    }
+    const btnRoll = document.getElementById("btn-roll");
+    btnRoll.disabled = state.turn.diceRolled;
+  }
+  else if(phaseName === "Construcción"){
+    document.getElementById("construction-block").style.display = "block";
+    document.getElementById("constr-used").textContent = state.turn.buildsThisTurn;
+    btnContinue.textContent = "Continuar a Acción →";
+  }
+  else if(phaseName === "Acción"){
+    renderActionBlock();
+    btnContinue.textContent = "Continuar a Actualización →";
+  }
+  else if(phaseName === "Actualización"){
+    renderUpdateBlock();
+    const isLastPlayer = state.currentPlayerIndex === state.players.length-1;
+    btnContinue.textContent = isLastPlayer ? (state.round>=state.maxRounds ? "Finalizar partida 🏁" : "Finalizar ronda y continuar →") : "Pasar turno →";
+  }
+}
+
+function renderActionBlock(){
+  const block = document.getElementById("action-block");
+  block.style.display = "block";
+  const pl = currentPlayer();
+
+  const upgradeableTypes = BUILDING_KEYS.filter(t => canUpgradeType(pl, t));
+  let html = "";
+
+  if(state.turn.upgradeUsed){
+    html += `<p class="dice-hint">Ya usaste tu acción disponible este turno.</p>`;
+  } else {
+    html += `<div class="btn-row" style="margin-bottom:8px;">
+      <button class="btn btn-block" id="btn-open-upgrade" ${upgradeableTypes.length===0 ? "disabled":""}>🔧 Mejorar construcción ($${UPGRADE_COST})</button>
+    </div>`;
+    html += `<div class="btn-row" style="margin-bottom:8px;">
+      <button class="btn btn-block" id="btn-special-project" ${pl.specialProjectUsed || pl.money<SPECIAL_PROJECT_COST ? "disabled":""}>🏗️ Proyecto especial ($${SPECIAL_PROJECT_COST}, +${SPECIAL_PROJECT_POINTS}pts)</button>
+    </div>`;
+    if(upgradeableTypes.length===0){
+      html += `<p class="dice-hint">Necesitas 3+ construcciones del mismo tipo para mejorar.</p>`;
+    }
+  }
+  block.innerHTML = html;
+
+  const btnUp = document.getElementById("btn-open-upgrade");
+  if(btnUp) btnUp.addEventListener("click", openUpgradeModal);
+  const btnSp = document.getElementById("btn-special-project");
+  if(btnSp) btnSp.addEventListener("click", ()=>{
+    const res = performSpecialProject();
+    if(res.ok){
+      toast(`🏗️ Proyecto especial completado: +${SPECIAL_PROJECT_POINTS} puntos.`, "good");
+      logEvent("Acción", `${currentPlayer().name} completó un proyecto especial (+${SPECIAL_PROJECT_POINTS} pts).`);
+    } else {
+      toast(res.reason, "warn");
+    }
+    fullRender();
+  });
+}
+
+function renderUpdateBlock(){
+  const block = document.getElementById("update-block");
+  block.style.display = "block";
+  const st1 = indicatorStatus(state.city.economy);
+  const st2 = indicatorStatus(state.city.wellbeing);
+  const st3 = indicatorStatus(state.city.planet);
+  block.innerHTML = `
+    <div class="constr-counter" style="flex-direction:column; align-items:flex-start; gap:4px;">
+      <div>💰 Economía: <b>${state.city.economy}</b> (${st1.label})</div>
+      <div>👥 Bienestar: <b>${state.city.wellbeing}</b> (${st2.label})</div>
+      <div>🌎 Planeta: <b>${state.city.planet}</b> (${st3.label})</div>
+    </div>
+  `;
+}
+
+/* =========================================================================
+   12. LOG / TOASTS
+   ========================================================================= */
+
+function logEvent(tag, text){
+  const list = document.getElementById("log-list");
+  const entry = document.createElement("div");
+  entry.className = "log-entry";
+  entry.innerHTML = `<span class="tag">${tag}</span>${text}`;
+  list.prepend(entry);
+  while(list.children.length > 60) list.removeChild(list.lastChild);
+}
+
+function toast(msg, type){
+  const stack = document.getElementById("toast-stack");
+  const el = document.createElement("div");
+  el.className = "toast" + (type==="crisis" ? " crisis" : type==="good" ? " good" : "");
+  el.textContent = msg;
+  stack.appendChild(el);
+  setTimeout(()=>{ el.style.opacity="0"; el.style.transition="opacity .3s"; setTimeout(()=>el.remove(),300); }, 3400);
+}
+
+/* =========================================================================
+   13. FLUJO DE FASES / TURNOS
+   ========================================================================= */
+
+function beginTurn(){
+  state.turn = {
+    buildsThisTurn:0, buildTypesThisTurn:[], diceRolled:false, lastRoll:null,
+    landedParcelIndex:null, upgradeUsed:false, incomeCollected:0
+  };
+  state.selectedParcelIndex = null;
+  state.phaseIndex = 0;
+  const {total, penalty} = collectIncome();
+  const pl = currentPlayer();
+  logEvent("Ingresos", `${pl.name} recibe $${total}${penalty>0?` (crisis económica: -$${penalty})`:""}.`);
+}
+
+function advancePhase(){
+  const phaseName = state.phases[state.phaseIndex];
+
+  if(phaseName === "Planificación" && !state.turn.diceRolled){
+    toast("Primero debes tirar el dado.", "warn");
+    return;
+  }
+
+  if(phaseName === "Actualización"){
+    finishPlayerTurn();
+    return;
+  }
+
+  state.phaseIndex += 1;
+  fullRender();
+}
+
+function finishPlayerTurn(){
+  const isLastPlayer = state.currentPlayerIndex === state.players.length-1;
+
+  if(isLastPlayer){
+    const events = applyRoundEndCrises();
+    events.forEach(e => { logEvent("Crisis", e); toast(e, "crisis"); });
+    logEvent("Ronda", `Ronda ${state.round} completada.`);
+    if(state.round >= state.maxRounds){
+      endGame();
+      return;
+    }
+    state.round += 1;
+    state.currentPlayerIndex = 0;
+  } else {
+    state.currentPlayerIndex += 1;
+  }
+  beginTurn();
+  fullRender();
+}
+
+function endGame(){
+  state.gameOver = true;
+  const scores = computeFinalScores();
+  const tier = cityBonusTier();
+  document.getElementById("end-city-state").textContent =
+    `${tier.label} — Bono de ${tier.bonus>=0?"+":""}${tier.bonus} puntos para cada jugador.`;
+  const list = document.getElementById("final-scores");
+  list.innerHTML = scores.map((s,i)=>`
+    <div class="final-row ${i===0?"winner":""}">
+      <span class="final-rank">#${i+1}</span>
+      <span class="player-dot" style="background:${s.color}"></span>
+      <span>${escapeHtml(s.name)}</span>
+      <span style="color:var(--text-faint); font-size:11px;">(${s.individualPoints} + ${s.bonus})</span>
+      <span class="final-score">${s.final}</span>
+    </div>
+  `).join("");
+  document.getElementById("end-overlay").classList.remove("hidden");
+  logEvent("Fin", `Partida finalizada. Ganador: ${scores[0].name} con ${scores[0].final} puntos.`);
+}
+
+/* =========================================================================
+   14. DADO
+   ========================================================================= */
+
+// NOTA DE ROBUSTEZ: el resultado del dado y el movimiento del avatar se
+// calculan de forma SÍNCRONA en cuanto se pulsa el botón (o Espacio/Enter),
+// para que el estado del juego nunca dependa de que un temporizador de
+// animación termine. La animación visual del dado es puramente cosmética
+// (CSS) y no bloquea ni retrasa la lógica del turno, evitando que un clic
+// repetido o una tecla mantenida puedan dejar el turno "atascado".
+function rollDice(){
+  if(state.turn.diceRolled) return;
+  const dieEl = document.getElementById("die-face");
+  const roll = 1 + Math.floor(Math.random()*6);
+
+  // Animación cosmética (no gatilla lógica de juego)
+  dieEl.classList.remove("rolling");
+  void dieEl.offsetWidth; // reiniciar animación CSS
+  dieEl.classList.add("rolling");
+  dieEl.textContent = roll;
+  setTimeout(()=> dieEl.classList.remove("rolling"), 500);
+
+  finishRoll(roll);
+}
+
+function finishRoll(roll){
+  try{
+    const pl = currentPlayer();
+    moveAvatar(pl, roll);
+    state.turn.diceRolled = true;
+    state.turn.lastRoll = roll;
+    logEvent("Dado", `${pl.name} tira un ${roll} y avanza a la parcela ${state.parcels[pl.avatarParcelIndex].id}.`);
+    fullRender();
+  } catch(err){
+    console.error("ERROR en finishRoll:", err);
+    // Asegurar que el turno no quede bloqueado aunque algo falle inesperadamente.
+    state.turn.diceRolled = true;
+    fullRender();
+  }
+}
+
+/* =========================================================================
+   15. MODALES — CONSTRUCCIÓN
+   ========================================================================= */
+
+function openBuildModal(parcelIndex){
+  const parcel = state.parcels[parcelIndex];
+  const pl = currentPlayer();
+  document.getElementById("build-parcel-id").textContent = parcel.id;
+  document.getElementById("build-parcel-sub").textContent = parcel.terrain==="green"
+    ? "⚠️ Esta parcela es una zona verde original. Construir aquí (que no sea otra zona verde) aplica −50 Planeta adicional."
+    : "Elige el tipo de construcción para esta parcela.";
+
+  const grid = document.getElementById("build-grid");
+  grid.innerHTML = "";
+  BUILDING_KEYS.forEach(key => {
+    const t = BUILDING_TYPES[key];
+    const typeCheck = canBuildType(key);
+    const affordable = pl.money >= t.cost;
+    const disabled = !typeCheck.ok || !affordable;
+    const btn = document.createElement("button");
+    btn.className = "build-option";
+    btn.disabled = disabled;
+    btn.title = !typeCheck.ok ? typeCheck.reason : !affordable ? "Dinero insuficiente." : "";
+    btn.innerHTML = `
+      <div class="bo-head"><span>${t.icon} ${t.label}</span><span class="bo-cost">$${t.cost}</span></div>
+      <div class="bo-stats">
+        <span class="stat-pill ${t.economy>=0?'pos':'neg'}">💰${t.economy>=0?'+':''}${t.economy}</span>
+        <span class="stat-pill ${t.wellbeing>=0?'pos':'neg'}">👥${t.wellbeing>=0?'+':''}${t.wellbeing}</span>
+        <span class="stat-pill ${t.planet>=0?'pos':'neg'}">🌎${t.planet>=0?'+':''}${t.planet}${parcel.terrain==="green" && key!=="green" ? " (-50)":""}</span>
+        <span class="stat-pill pos">🏆+${t.points}</span>
+      </div>
+    `;
+    btn.addEventListener("click", () => {
+      const res = performBuild(parcelIndex, key);
+      if(res.ok){
+        toast(`${t.icon} ${t.label} construida en ${parcel.id}.`, "good");
+        logEvent("Construcción", `${pl.name} construyó ${t.label} en ${parcel.id} (+${res.pointsGained} pts)${res.onCityGreen ? " — reemplazó zona verde (-50 Planeta extra)" : ""}.`);
+        closeModal("build-overlay");
+        fullRender();
+      } else {
+        toast(res.reason, "warn");
+      }
+    });
+    grid.appendChild(btn);
+  });
+
+  // Opción de recuperación ambiental si la parcela ya tiene un edificio contaminante
+  // (solo aplica si esta parcela específica llegó aquí vía otro camino — normalmente
+  // canBuildAt bloquea parcelas ocupadas; la recuperación se ofrece desde Fase Acción).
+
+  document.getElementById("build-overlay").classList.remove("hidden");
+}
+
+function openUpgradeModal(){
+  const pl = currentPlayer();
+  const grid = document.getElementById("upgrade-grid");
+  grid.innerHTML = "";
+
+  const eligibleParcels = pl.buildings
+    .map(pid => state.parcels.find(p=>p.id===pid))
+    .filter(p => p && p.building && !p.building.sustainable && canUpgradeType(pl, p.building.type));
+
+  if(eligibleParcels.length === 0){
+    grid.innerHTML = `<div class="empty-hint">No tienes construcciones elegibles (necesitas 3+ del mismo tipo).</div>`;
+  }
+
+  eligibleParcels.forEach(parcel => {
+    const t = BUILDING_TYPES[parcel.building.type];
+    const stats = computeSustainableStats(parcel.building.type);
+    const btn = document.createElement("button");
+    btn.className = "build-option";
+    btn.disabled = pl.money < UPGRADE_COST;
+    btn.innerHTML = `
+      <div class="bo-head"><span>${t.icon} ${t.label} — ${parcel.id} → ♻ Sostenible</span><span class="bo-cost">$${UPGRADE_COST}</span></div>
+      <div class="bo-stats">
+        <span class="stat-pill pos">💰${stats.economy}</span>
+        <span class="stat-pill pos">👥${stats.wellbeing}</span>
+        <span class="stat-pill pos">🌎${stats.planet}</span>
+        <span class="stat-pill pos">🏆+${stats.points}</span>
+      </div>
+    `;
+    btn.addEventListener("click", () => {
+      const res = performUpgrade(parcel.id);
+      if(res.ok){
+        toast(`♻ ${t.label} mejorada a versión sostenible.`, "good");
+        logEvent("Mejora", `${pl.name} mejoró ${t.label} (${parcel.id}) a versión sostenible (+${UPGRADE_POINTS} pts).`);
+        closeModal("upgrade-overlay");
+        fullRender();
+      } else {
+        toast(res.reason, "warn");
+      }
+    });
+    grid.appendChild(btn);
+  });
+
+  document.getElementById("upgrade-overlay").classList.remove("hidden");
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.add("hidden");
+}
+
+/* =========================================================================
+   16. RENDER MAESTRO
+   ========================================================================= */
+
+function fullRender(){
+  document.getElementById("hud-round").textContent = state.round;
+  document.getElementById("hud-maxrounds").textContent = state.maxRounds;
+  document.getElementById("hud-phase").textContent = state.phases[state.phaseIndex];
+  document.getElementById("hud-currentplayer").textContent = currentPlayer().name;
+
+  renderIndicators();
+  renderBoard();
+  renderPlayers();
+  renderPhasePanel();
+}
+
+/* =========================================================================
+   17. SETUP / INICIO DE PARTIDA
+   ========================================================================= */
+
+function buildSetupNameRows(){
+  const count = parseInt(document.getElementById("setup-players").value, 10);
+  const wrap = document.getElementById("setup-names");
+  wrap.innerHTML = "";
+  for(let i=0;i<count;i++){
+    const row = document.createElement("div");
+    row.className = "player-name-row";
+    row.innerHTML = `
+      <span class="player-dot" style="background:${PLAYER_COLORS[i%PLAYER_COLORS.length]}"></span>
+      <input type="text" value="Jugador ${i+1}" data-idx="${i}">
+    `;
+    wrap.appendChild(row);
+  }
+}
+
+function startGame(){
+  const count = parseInt(document.getElementById("setup-players").value, 10);
+  const money = Math.max(0, parseInt(document.getElementById("setup-money").value, 10) || 0);
+  const names = Array.from(document.querySelectorAll("#setup-names input")).map(inp => inp.value.trim() || null);
+  state = newGame(names.slice(0,count), money);
+  beginTurn();
+  document.getElementById("setup-overlay").classList.add("hidden");
+  fullRender();
+  logEvent("Partida", `Nueva partida iniciada con ${count} jugadores y $${money} iniciales cada uno.`);
+}
+
+/* =========================================================================
+   18. EVENTOS GLOBALES
+   ========================================================================= */
+
+document.getElementById("setup-players").addEventListener("change", buildSetupNameRows);
+document.getElementById("btn-start-game").addEventListener("click", startGame);
+document.getElementById("btn-roll").addEventListener("click", rollDice);
+document.getElementById("btn-continue").addEventListener("click", advancePhase);
+document.getElementById("build-close").addEventListener("click", ()=>closeModal("build-overlay"));
+document.getElementById("upgrade-close").addEventListener("click", ()=>closeModal("upgrade-overlay"));
+document.getElementById("btn-restart").addEventListener("click", ()=>{
+  document.getElementById("end-overlay").classList.add("hidden");
+  document.getElementById("setup-overlay").classList.remove("hidden");
+});
+
+document.addEventListener("keydown", (e)=>{
+  if(e.code !== "Space" && e.code !== "Enter") return;
+  if(!document.getElementById("setup-overlay").classList.contains("hidden")) return;
+  if(!document.getElementById("build-overlay").classList.contains("hidden")) return;
+  if(!document.getElementById("upgrade-overlay").classList.contains("hidden")) return;
+  if(!document.getElementById("end-overlay").classList.contains("hidden")) return;
+  e.preventDefault();
+  const phaseName = state && state.phases[state.phaseIndex];
+  if(phaseName === "Planificación" && !state.turn.diceRolled){
+    rollDice();
+  } else {
+    advancePhase();
+  }
+});
+
+/* =========================================================================
+   19. ARRANQUE
+   ========================================================================= */
+
+runInternalValidation();
+buildSetupNameRows();
+
+})();
+</script>
+</body>
+</html>

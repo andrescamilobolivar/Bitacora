@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            padding: 2rem 1rem;
+        }
+        .sources-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .source-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .source-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .source-category {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .source-citation {
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+        .source-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border: 1px solid var(--primary-color);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .source-link:hover {
+            background-color: var(--primary-color);
+            color: #ffffff;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="sources-container">
+        <!-- <h1></h1> -->
+        <!-- <p class="subtitle"></p> -->
+
+        <!-- 1 -->
+        <article class="source-card">
+            <span class="source-category">Actantes – Bennett y Latour</span>
+            <p class="source-citation"><strong>Bennett, J.</strong> (2010). Vibrant Matter: A Political Ecology of Things. <em>Duke University Press</em>.</p>
+            <a class="source-link" href="https://www.dukeupress.edu/vibrant-matter" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 2 -->
+        <article class="source-card">
+            <span class="source-category">Modelos de sociedades autoorganizadas</span>
+            <p class="source-citation"><strong>Anzola, D., Barbrook-Johnson, P., & Cano, J. I.</strong> (2017). Self-organization and social science. <em>Computational and Mathematical Organization Theory</em>.</p>
+            <a class="source-link" href="https://link.springer.com/article/10.1007/s10588-016-9224-2" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 3 -->
+        <article class="source-card">
+            <span class="source-category">Holobionte y epigenética</span>
+            <p class="source-citation">A systematic framework for understanding the microbiome in human health and disease.</p>
+            <a class="source-link" href="https://www.nature.com/articles/s41392-024-01946-6" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 4 -->
+        <article class="source-card">
+            <span class="source-category">Campos de interacción – Haraway, Weinstock, Hayles</span>
+            <p class="source-citation">Dis/Locating Posthumanism in European Literary and Critical Traditions.</p>
+            <a class="source-link" href="https://www.tandfonline.com/doi/full/10.1080/13825577.2014.916999" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+
+        <!-- 5 -->
+        <article class="source-card">
+            <span class="source-category">Crítica a modelos de ciudad actual y sus modelos de producción</span>
+            <p class="source-citation"><strong>Golubiewski, N.</strong> (2012). Is There a Metabolism of an Urban Ecosystem? An Ecological Critique. <em>Ambio</em>.</p>
+            <a class="source-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3472014/" target="_blank" rel="noopener noreferrer">Acceder al Enlace ↗</a>
+        </article>
+    </div>
+</body>
+</html>

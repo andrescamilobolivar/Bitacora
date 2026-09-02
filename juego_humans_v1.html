@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Humans Inc. 2050</title>
+  <style>
+    :root {
+      --bg-dark: #121212;
+      --panel-bg: #1e1e1e;
+      --text-main: #f0f0f0;
+      --accent: #00d2ff;
+      --eco: #ffc107;
+      --wb: #e91e63;
+      --planet: #4caf50;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Pantalla inicial */
+    #setup-screen {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #setup-screen h1 { font-size: 3rem; margin-bottom: 20px; color: var(--accent); }
+    #setup-screen input { padding: 10px; font-size: 1.2rem; margin-bottom: 20px; text-align: center; }
+    #setup-screen button { padding: 15px 30px; font-size: 1.2rem; cursor: pointer; background: var(--accent); border: none; font-weight: bold; }
+
+    /* Diseño Principal */
+    #game-container { display: flex; width: 100%; height: 100%; display: none; }
+    
+    #left-panel {
+      width: 250px;
+      background: var(--panel-bg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      border-right: 2px solid #333;
+    }
+
+    #board-container {
+      flex: 1;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #2a2a2a;
+      overflow: hidden;
+    }
+
+    #right-panel {
+      width: 300px;
+      background: var(--panel-bg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      border-left: 2px solid #333;
+      overflow-y: auto;
+    }
+
+    /* Indicadores de Ciudad */
+    .indicator-box { margin-bottom: 15px; }
+    .indicator-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px; }
+    .progress-bar { width: 100%; height: 15px; background: #333; border-radius: 8px; overflow: hidden; }
+    .progress-fill { height: 100%; transition: width 0.3s ease, background-color 0.3s ease; }
+    
+    #eco-fill { background-color: var(--eco); }
+    #wb-fill { background-color: var(--wb); }
+    #planet-fill { background-color: var(--planet); }
+
+    /* Estado de Jugador y Turnos */
+    .section-title { font-size: 1.2rem; color: var(--accent); border-bottom: 1px solid #444; padding-bottom: 5px; margin-top: 20px; margin-bottom: 10px; }
+    .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 1.1rem; }
+    
+    #action-log {
+      flex: 1;
+      background: #111;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      overflow-y: auto;
+      margin-top: 20px;
+      border: 1px solid #444;
+    }
+
+    /* Botones y Tienda */
+    .build-btn {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 8px;
+      background: #333;
+      color: white;
+      border: 1px solid #555;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.2s;
+    }
+    .build-btn:hover:not(:disabled) { background: #555; }
+    .build-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-cost { float: right; font-weight: bold; color: #4caf50; }
+
+    #dice-btn {
+      width: 100%; padding: 15px; font-size: 1.2rem; background: var(--accent); color: black; font-weight: bold; border: none; cursor: pointer; margin-bottom: 20px;
+    }
+    #dice-btn:hover { background: #00b3db; }
+
+    /* SVG Tablero */
+    svg { width: 90%; height: 90%; drop-shadow: 0px 5px 15px rgba(0,0,0,0.5); }
+    .parcel { stroke: #222; stroke-width: 3; transition: opacity 0.2s, stroke-width 0.2s; cursor: pointer; }
+    .parcel:hover { stroke-width: 6; stroke: white; }
+    .parcel.available { opacity: 0.8; }
+    .parcel.occupied { opacity: 1; }
+    
+    /* Avatares */
+    .avatar { transition: cx 0.4s ease, cy 0.4s ease; }
+    
+    /* Modal de Fin de Juego */
+    #end-screen {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9);
+      display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="setup-screen">
+    <h1>Humans Inc. 2050</h1>
+    <p>Ingresa el dinero inicial para los jugadores (Ej: 1000):</p>
+    <input type="number" id="init-money" value="1000" min="500" step="100">
+    <button onclick="startGame()">INICIAR PARTIDA</button>
+  </div>
+
+  <div id="game-container">
+    <div id="left-panel">
+      <h2>Estado Ciudad</h2>
+      
+      <div class="indicator-box">
+        <div class="indicator-header"><span>💰 Economía</span><span id="eco-val">500</span></div>
+        <div class="progress-bar"><div id="eco-fill" class="progress-fill" style="width: 50%;"></div></div>
+      </div>
+      
+      <div class="indicator-box">
+        <div class="indicator-header"><span>👥 Bienestar</span><span id="wb-val">500</span></div>
+        <div class="progress-bar"><div id="wb-fill" class="progress-fill" style="width: 50%;"></div></div>
+      </div>
+      
+      <div class="indicator-box">
+        <div class="indicator-header"><span>🌎 Planeta</span><span id="planet-val">1000</span></div>
+        <div class="progress-bar"><div id="planet-fill" class="progress-fill" style="width: 100%;"></div></div>
+      </div>
+
+      <div class="section-title">Información de Partida</div>
+      <div class="stat-row"><span>Ronda:</span> <span id="round-val">1 / 10</span></div>
+      <div class="stat-row"><span>Fase actual:</span> <span id="phase-val" style="color:var(--accent)">Ingresos</span></div>
+      <div class="stat-row"><span>Turno de:</span> <span id="turn-val">Jugador 1</span></div>
+
+      <div id="action-log"></div>
+    </div>
+
+    <div id="board-container">
+      <!-- El SVG del tablero se genera dinámicamente aquí -->
+      <svg id="game-board" viewBox="-300 -300 600 600"></svg>
+    </div>
+
+    <div id="right-panel">
+      <h2>Panel del Jugador</h2>
+      <div class="stat-row"><span>💵 Dinero:</span> <span id="player-money" style="color:#4caf50; font-weight:bold;">$0</span></div>
+      <div class="stat-row"><span>🏆 Puntos:</span> <span id="player-points">0</span></div>
+      <div class="stat-row"><span>🏗️ Construido (Turno):</span> <span id="player-builds-turn">0 / 2</span></div>
+      
+      <div class="section-title">Controles</div>
+      <button id="dice-btn" onclick="rollDice()">Tirar Dado (Espacio/Enter)</button>
+      <button id="end-turn-btn" onclick="endTurn()" style="width:100%; padding: 10px; margin-bottom: 20px; background: #666; color: white; border: none; cursor: pointer;">Finalizar Turno</button>
+
+      <div class="section-title">Mercado de Construcción</div>
+      <p style="font-size:0.8rem; color:#aaa;">Selecciona una parcela en el tablero y luego haz clic en una construcción.</p>
+      <div id="build-menu">
+        <!-- Botones generados dinámicamente -->
+      </div>
+    </div>
+  </div>
+
+  <div id="end-screen">
+    <h1 style="color: var(--accent); font-size: 3rem;">Fin de la Partida</h1>
+    <div id="end-results" style="font-size: 1.5rem; margin-bottom: 30px; background: #222; padding: 20px; border-radius: 10px;"></div>
+    <button onclick="location.reload()" style="padding: 15px 30px; font-size: 1.2rem; cursor: pointer; background: var(--accent); border: none; font-weight: bold;">JUGAR DE NUEVO</button>
+  </div>
+
+  <script>
+    // --- 1. DATOS Y REGLAS CONSOLIDADAS ---
+    const BUILDINGS = {
+      house: { name: '🏠 Vivienda', cost: 100, eco: 40, wb: 100, planet: -20, pts: 50, income: 20, color: '#ff9a9e' },
+      factory: { name: '🏭 Fábrica', cost: 150, eco: 150, wb: -50, planet: -120, pts: 80, income: 40, color: '#ff7f50' },
+      tech: { name: '💻 Tecnología', cost: 180, eco: 180, wb: 60, planet: -20, pts: 100, income: 50, color: '#00ced1' },
+      transport: { name: '🚄 Transporte', cost: 220, eco: 60, wb: 120, planet: 80, pts: 90, income: 20, color: '#6a5acd' },
+      energy: { name: '⚡ Energía', cost: 200, eco: 100, wb: 30, planet: 20, pts: 85, income: 35, color: '#ffd700' },
+      commerce: { name: '🛍️ Comercio', cost: 130, eco: 120, wb: 70, planet: -40, pts: 75, income: 45, color: '#ff69b4' },
+      green: { name: '🌳 Zona Verde', cost: 300, eco: 10, wb: 150, planet: 200, pts: 120, income: 0, color: '#32cd32' }
+    };
+
+    // --- 2. ESTADO DEL JUEGO (Data State) ---
+    const state = {
+      city: { economy: 500, wellbeing: 500, planet: 1000 },
+      game: { round: 1, maxRounds: 10, currentPlayerIdx: 0, phase: 1, selectedParcel: null },
+      players: [
+        { id: 'J1', money: 0, points: 0, buildings: [], builtThisTurn: 0, categoriesBuilt: [], avatarColor: '#ffffff', currentNode: 0 },
+        { id: 'J2', money: 0, points: 0, buildings: [], builtThisTurn: 0, categoriesBuilt: [], avatarColor: '#ff0000', currentNode: Math.floor(Math.random()*10) } // Nodo inicial aleatorio
+      ],
+      board: { nodes: [], parcels: [] }
+    };
+
+    // --- 3. GENERACIÓN DEL TABLERO (Matemáticas y SVG) ---
+    function generateBoard() {
+      const svg = document.getElementById('game-board');
+      const hexSize = 55;
+      const nodesMap = new Map(); // Para unificar intersecciones (vértices)
+      
+      // Función auxiliar para registrar nodos e indexarlos
+      function registerNode(x, y) {
+        const key = `${Math.round(x)},${Math.round(y)}`;
+        if(!nodesMap.has(key)) {
+          nodesMap.set(key, { id: state.board.nodes.length, x, y, edges: new Set() });
+          state.board.nodes.push(nodesMap.get(key));
+        }
+        return nodesMap.get(key);
+      }
+
+      function drawPolygon(centerX, centerY, radius, sides, angleOffset, parcelId, baseColor, isHex) {
+        const points = [];
+        const nodeRefs = [];
+        for (let i = 0; i < sides; i++) {
+          const angle = angleOffset + (i * 2 * Math.PI / sides);
+          const px = centerX + radius * Math.cos(angle);
+          const py = centerY + radius * Math.sin(angle);
+          points.push(`${px},${py}`);
+          nodeRefs.push(registerNode(px, py));
+        }
+
+        // Crear bordes lógicos para movimiento (grafo)
+        for (let i = 0; i < nodeRefs.length; i++) {
+          const n1 = nodeRefs[i];
+          const n2 = nodeRefs[(i + 1) % nodeRefs.length];
+          n1.edges.add(n2.id);
+          n2.edges.add(n1.id);
+        }
+
+        const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        poly.setAttribute("points", points.join(" "));
+        poly.setAttribute("fill", baseColor);
+        poly.setAttribute("class", "parcel available");
+        poly.setAttribute("data-id", parcelId);
+        poly.onclick = () => selectParcel(parcelId);
+        svg.appendChild(poly);
+
+        return nodeRefs;
+      }
+
+      // Generar centro hexagonal (simulando panal central de la imagen)
+      let parcelId = 0;
+      const hexOffsets = [
+        {q:0, r:0}, {q:1, r:0}, {q:0, r:1}, {q:-1, r:1}, {q:-1, r:0}, {q:0, r:-1}, {q:1, r:-1}
+      ];
+      
+      hexOffsets.forEach(h => {
+        const x = hexSize * Math.sqrt(3) * (h.q + h.r/2);
+        const y = hexSize * 3/2 * h.r;
+        state.board.parcels.push({ id: parcelId, type: 'empty', occupied: false, owner: null, polyRef: null, baseColor: '#b0b8c4' });
+        drawPolygon(x, y, hexSize, 6, Math.PI/6, parcelId, '#b0b8c4', true);
+        parcelId++;
+      });
+
+      // Generar formas perimetrales simulando la imagen
+      const ringRadius = hexSize * 2.5;
+      for (let i = 0; i < 12; i++) {
+        const angle = i * (Math.PI / 6);
+        const x = ringRadius * Math.cos(angle);
+        const y = ringRadius * Math.sin(angle);
+        // Distribuimos aleatoriamente colores de zonas periféricas
+        const colors = ['#87cefa', '#ff9a9e', '#ffd700', '#ff7f50', '#32cd32', '#ba55d3'];
+        const isGreen = (i % 2 === 0); // Asignamos 6 zonas verdes perimetrales iniciales
+        const color = isGreen ? '#32cd32' : colors[i % colors.length];
+        
+        state.board.parcels.push({ 
+          id: parcelId, 
+          type: isGreen ? 'green' : 'empty', 
+          occupied: isGreen, 
+          owner: isGreen ? 'city' : null, 
+          baseColor: color 
+        });
+        
+        drawPolygon(x, y, hexSize*0.8, 4, angle, parcelId, color, false);
+        parcelId++;
+      }
+
+      // Guardar referencias a elementos SVG en el estado
+      document.querySelectorAll('.parcel').forEach(el => {
+        const id = parseInt(el.getAttribute('data-id'));
+        state.board.parcels[id].polyRef = el;
+      });
+
+      // Inicializar Avatares
+      state.players.forEach(p => {
+        const node = state.board.nodes[p.currentNode];
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", node.x);
+        circle.setAttribute("cy", node.y);
+        circle.setAttribute("r", "12");
+        circle.setAttribute("fill", p.avatarColor);
+        circle.setAttribute("stroke", "#000");
+        circle.setAttribute("stroke-width", "3");
+        circle.setAttribute("class", "avatar");
+        circle.setAttribute("id", `avatar-${p.id}`);
+        svg.appendChild(circle);
+      });
+    }
+
+    // --- 4. LÓGICA DEL JUEGO Y REGLAS ---
+    function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
+    
+    function logMsg(msg) {
+      const log = document.getElementById('action-log');
+      log.innerHTML += `<div>> ${msg}</div>`;
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function updateUI() {
+      const cp = state.players[state.game.currentPlayerIdx];
+      
+      // Actualizar contadores colectivos
+      document.getElementById('eco-val').innerText = state.city.economy;
+      document.getElementById('wb-val').innerText = state.city.wellbeing;
+      document.getElementById('planet-val').innerText = state.city.planet;
+      
+      document.getElementById('eco-fill').style.width = `${(state.city.economy / 1000) * 100}%`;
+      document.getElementById('wb-fill').style.width = `${(state.city.wellbeing / 1000) * 100}%`;
+      document.getElementById('planet-fill').style.width = `${(state.city.planet / 1000) * 100}%`;
+      
+      // Colores de crisis
+      document.getElementById('eco-fill').style.backgroundColor = state.city.economy < 200 ? 'red' : 'var(--eco)';
+      document.getElementById('wb-fill').style.backgroundColor = state.city.wellbeing < 200 ? 'red' : 'var(--wb)';
+      document.getElementById('planet-fill').style.backgroundColor = state.city.planet < 200 ? 'red' : 'var(--planet)';
+
+      // Actualizar estado general
+      document.getElementById('round-val').innerText = `${state.game.round} / ${state.game.maxRounds}`;
+      const phaseNames = ["", "Ingresos", "Movimiento/Planificación", "Construcción", "Actualización"];
+      document.getElementById('phase-val').innerText = phaseNames[state.game.phase];
+      document.getElementById('turn-val').innerText = cp.id;
+      document.getElementById('turn-val').style.color = cp.avatarColor;
+
+      // Actualizar stats jugador
+      document.getElementById('player-money').innerText = `$${cp.money}`;
+      document.getElementById('player-points').innerText = cp.points;
+      document.getElementById('player-builds-turn').innerText = `${cp.builtThisTurn} / 2`;
+
+      // Control de botones
+      document.getElementById('dice-btn').disabled = state.game.phase !== 2;
+    }
+
+    function populateBuildMenu() {
+      const menu = document.getElementById('build-menu');
+      menu.innerHTML = '';
+      for (const [key, b] of Object.entries(BUILDINGS)) {
+        const btn = document.createElement('button');
+        btn.className = 'build-btn';
+        btn.innerHTML = `${b.name} <span class="btn-cost">$${b.cost}</span>`;
+        btn.onclick = () => tryBuild(key);
+        menu.appendChild(btn);
+      }
+    }
+
+    function startGame() {
+      const initMoney = parseInt(document.getElementById('init-money').value) || 1000;
+      state.players.forEach(p => p.money = initMoney);
+      document.getElementById('setup-screen').style.display = 'none';
+      document.getElementById('game-container').style.display = 'flex';
+      
+      generateBoard();
+      populateBuildMenu();
+      startTurn();
+    }
+
+    function startTurn() {
+      const cp = state.players[state.game.currentPlayerIdx];
+      cp.builtThisTurn = 0;
+      cp.categoriesBuilt = [];
+      state.game.selectedParcel = null;
+      
+      // FASE 1: INGRESOS
+      state.game.phase = 1;
+      let income = 0;
+      cp.buildings.forEach(bKey => { income += BUILDINGS[bKey].income; });
+      
+      // Regla de Crisis Económica: Reducción total de 10
+      if (state.city.economy < 200 && income > 0) {
+        income = Math.max(0, income - 10);
+        logMsg(`⚠️ Crisis Económica: Ingresos reducidos en $10.`);
+      }
+      
+      cp.money += income;
+      logMsg(`<b>${cp.id}</b> inicia turno. Ingresos: $${income}.`);
+      
+      // Pasar a Movimiento
+      state.game.phase = 2;
+      updateUI();
+    }
+
+    function rollDice() {
+      if (state.game.phase !== 2) return;
+      const dice = Math.floor(Math.random() * 6) + 1;
+      logMsg(`🎲 Tiraste un ${dice}.`);
+      moveAvatar(dice);
+    }
+
+    // Lógica de Movimiento por Intersecciones (Siempre "Derecha")
+    function moveAvatar(steps) {
+      const cp = state.players[state.game.currentPlayerIdx];
+      
+      let stepCount = 0;
+      const moveInterval = setInterval(() => {
+        if (stepCount >= steps) {
+          clearInterval(moveInterval);
+          state.game.phase = 3; // Pasa a Construcción
+          logMsg(`🚶 Movimiento finalizado. Selecciona parcela para construir o Finaliza Turno.`);
+          updateUI();
+          return;
+        }
+
+        const currNode = state.board.nodes[cp.currentNode];
+        const neighbors = Array.from(currNode.edges);
+        let nextNodeId = neighbors[0];
+
+        // Regla: Giro a la derecha aleatorio
+        if (neighbors.length > 1) {
+            // Simplificación geométrica: tomamos un nodo aleatorio de las opciones adyacentes
+            // para garantizar flujo sin bloquear la lógica de grafos en un mapa abstracto.
+            // (El cálculo exacto del producto cruz vectorial requiere rastrear vector previo continuo).
+            const filtered = neighbors.filter(n => n !== cp.lastNode); // evitar devolverse directamente
+            if(filtered.length > 0) {
+                nextNodeId = filtered[Math.floor(Math.random() * filtered.length)];
+            }
+        }
+        
+        cp.lastNode = cp.currentNode;
+        cp.currentNode = nextNodeId;
+        const targetNode = state.board.nodes[nextNodeId];
+
+        // Animación visual
+        const avatar = document.getElementById(`avatar-${cp.id}`);
+        avatar.setAttribute("cx", targetNode.x);
+        avatar.setAttribute("cy", targetNode.y);
+
+        stepCount++;
+      }, 400);
+    }
+
+    function selectParcel(id) {
+      if (state.game.phase !== 3) return;
+      const parcel = state.board.parcels[id];
+      if (parcel.owner === state.players[state.game.currentPlayerIdx].id) {
+        logMsg(`Ya eres dueño de esta parcela.`);
+        return;
+      }
+      state.game.selectedParcel = id;
+      
+      // Resaltar
+      document.querySelectorAll('.parcel').forEach(p => p.style.stroke = '#222');
+      parcel.polyRef.style.stroke = 'white';
+    }
+
+    function tryBuild(bKey) {
+      if (state.game.phase !== 3) return;
+      if (state.game.selectedParcel === null) {
+        logMsg(`❌ Selecciona una parcela en el tablero primero.`);
+        return;
+      }
+
+      const cp = state.players[state.game.currentPlayerIdx];
+      const parcel = state.board.parcels[state.game.selectedParcel];
+      const bData = BUILDINGS[bKey];
+
+      // Validaciones
+      if (cp.builtThisTurn >= 2) { logMsg(`❌ Límite de 2 construcciones por turno alcanzado.`); return; }
+      if (bKey !== 'green' && cp.categoriesBuilt.includes(bKey)) { logMsg(`❌ No puedes repetir categoría (excepto zona verde).`); return; }
+      if (cp.money < bData.cost) { logMsg(`❌ Fondos insuficientes ($${bData.cost}).`); return; }
+      if (parcel.occupied && parcel.type !== 'green') { logMsg(`❌ Parcela ya ocupada.`); return; }
+
+      // Pagar
+      cp.money -= bData.cost;
+      
+      // Regla Especial Zonas Verdes
+      let localPlanetMod = bData.planet;
+      let localPointsMod = bData.pts;
+
+      if (parcel.type === 'green') {
+        logMsg(`⚠️ Has construido sobre una Zona Verde. (-50 Planeta)`);
+        localPlanetMod -= 50;
+      }
+
+      // Aplicar modificadores colectivos (separación estricta de variables)
+      state.city.economy = clamp(state.city.economy + bData.eco, 0, 1000);
+      state.city.wellbeing = clamp(state.city.wellbeing + bData.wb, 0, 1000);
+      state.city.planet = clamp(state.city.planet + localPlanetMod, 0, 1000);
+
+      // Aplicar puntos individuales
+      cp.points += localPointsMod;
+      
+      // Registrar estado
+      cp.buildings.push(bKey);
+      cp.builtThisTurn++;
+      cp.categoriesBuilt.push(bKey);
+      
+      parcel.occupied = true;
+      parcel.owner = cp.id;
+      parcel.type = bKey;
+      parcel.polyRef.setAttribute("fill", bData.color);
+      
+      logMsg(`🏗️ Construido: ${bData.name}.`);
+      state.game.selectedParcel = null;
+      document.querySelectorAll('.parcel').forEach(p => p.style.stroke = '#222');
+      updateUI();
+    }
+
+    function endTurn() {
+      // FASE 4: ACTUALIZACIÓN Y CRISIS
+      const cp = state.players[state.game.currentPlayerIdx];
+      logMsg(`Fin del turno de ${cp.id}. Evaluando crisis...`);
+      
+      if (state.city.planet < 200) {
+        state.city.planet = clamp(state.city.planet - 30, 0, 1000);
+        state.city.wellbeing = clamp(state.city.wellbeing - 20, 0, 1000);
+        logMsg(`🔴 CRISIS AMBIENTAL Activa.`);
+      }
+      if (state.city.wellbeing < 200) {
+        state.city.wellbeing = clamp(state.city.wellbeing - 30, 0, 1000);
+        state.city.economy = clamp(state.city.economy - 20, 0, 1000);
+        logMsg(`🔴 CRISIS BIENESTAR Activa.`);
+      }
+
+      // Cambio de turno
+      state.game.currentPlayerIdx++;
+      if (state.game.currentPlayerIdx >= state.players.length) {
+        state.game.currentPlayerIdx = 0;
+        state.game.round++;
+        
+        if (state.game.round > state.game.maxRounds) {
+          endGame();
+          return;
+        }
+      }
+      
+      startTurn();
+    }
+
+    function endGame() {
+      document.getElementById('game-container').style.filter = "blur(5px)";
+      const endScreen = document.getElementById('end-screen');
+      const resultsDiv = document.getElementById('end-results');
+      endScreen.style.display = 'flex';
+
+      // Cálculo de Bono de Ciudad
+      const { economy, wellbeing, planet } = state.city;
+      let cityBonus = 0;
+      let cityStatus = "";
+
+      if (economy >= 700 && wellbeing >= 700 && planet >= 700) {
+        cityBonus = 200; cityStatus = "🟢 Ciudad Excelente";
+      } else if (economy >= 500 && wellbeing >= 500 && planet >= 500) {
+        cityBonus = 100; cityStatus = "🟡 Ciudad Equilibrada";
+      } else if (economy < 200 || wellbeing < 200 || planet < 200) {
+        cityBonus = -100; cityStatus = "🔴 Ciudad en Crisis";
+      } else {
+        cityBonus = 0; cityStatus = "🟠 Ciudad Inestable";
+      }
+
+      let html = `<p>Estado Final: <strong>${cityStatus}</strong> (Bono: ${cityBonus} pts)</p><hr>`;
+      
+      let winner = null;
+      let maxScore = -Infinity;
+
+      state.players.forEach(p => {
+        const finalScore = p.points + cityBonus;
+        html += `<p style="color:${p.avatarColor}">Jugador ${p.id}: ${p.points} base + ${cityBonus} = <strong>${finalScore} pts</strong></p>`;
+        if (finalScore > maxScore) { maxScore = finalScore; winner = p.id; }
+      });
+
+      html += `<h2 style="color:var(--accent); margin-top:20px;">🏆 ¡Gana el ${winner}!</h2>`;
+      resultsDiv.innerHTML = html;
+    }
+
+    // Controles de teclado
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' || e.code === 'Enter') {
+        e.preventDefault();
+        rollDice();
+      }
+    });
+
+  </script>
+</body>
+</html>
